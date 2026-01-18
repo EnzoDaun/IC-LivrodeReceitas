@@ -1,0 +1,1 @@
+Area dedicada ao desenvolvimento do frontend do projeto. Feito em React.js (jsx) com vite.
