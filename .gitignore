@@ -1,0 +1,58 @@
+# IDE files
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backend
+/descontao-backend/target/
+/descontao-backend/.mvn/
+/descontao-backend/mvnw
+/descontao-backend/mvnw.cmd
+
+# Frontend
+/descontao-frontend/node_modules/
+/descontao-frontend/dist/
+/descontao-frontend/.env.local
+/descontao-frontend/.env.development.local
+/descontao-frontend/.env.test.local
+/descontao-frontend/.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Build outputs
+build/
+dist/
