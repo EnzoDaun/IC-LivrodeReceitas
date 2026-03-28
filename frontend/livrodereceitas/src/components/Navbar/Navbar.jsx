@@ -18,21 +18,31 @@ import {
     Close as CloseIcon,
     MenuBook as MenuBookIcon,
 } from '@mui/icons-material';
+import {Link as RouterLink, useLocation} from 'react-router-dom';
 
-const Navbar = ({links = [], onSearch}) => {
+const Navbar = ({links = [], onSearch, initialActiveLink = 'Receitas', showSearch = true}) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [activeLink, setActiveLink] = useState('Receitas');
+    const [activeLink, setActiveLink] = useState(initialActiveLink);
+    const location = useLocation();
 
     const defaultLinks = [
         {label: 'Receitas', href: '#receitas'},
         {label: 'Mais vistas', href: '#mais-vistas'},
         {label: 'Favoritas', href: '#favoritas'},
-        {label: 'Login', href: '#login'},
+        {label: 'Login', to: '/login'},
         {label: 'Sobre nós', href: '#sobre'},
     ];
 
     const navigationLinks = links.length > 0 ? links : defaultLinks;
+
+    const isLinkActive = (link) => {
+        if (link.to) {
+            return location.pathname === link.to;
+        }
+
+        return activeLink === link.label;
+    };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
@@ -56,7 +66,8 @@ const Navbar = ({links = [], onSearch}) => {
                 {navigationLinks.map((link) => (
                     <ListItem key={link.label} disablePadding>
                         <ListItemButton
-                            component="a"
+                            component={link.to ? RouterLink : 'a'}
+                            to={link.to}
                             href={link.href}
                             onClick={() => {
                                 setActiveLink(link.label);
@@ -81,12 +92,11 @@ const Navbar = ({links = [], onSearch}) => {
                     px: 3,
                     py: 1.5,
                     minHeight: '56px !important',
-                    backgroundColor: 'transparent',
+                    backgroundColor: '#F0EBE1',
                     border: '1.5px solid rgba(0, 0, 0, 0.08)',
                     borderRadius: '16px',
                 }}
             >
-                {/* Logo - Left */}
                 <Box sx={{display: 'flex', alignItems: 'center', gap: 1.2, flexShrink: 0}}>
                     <MenuBookIcon sx={{fontSize: 20, color: '#6B6B6B', strokeWidth: 0.5}}/>
                     <Typography
@@ -105,7 +115,6 @@ const Navbar = ({links = [], onSearch}) => {
                     </Typography>
                 </Box>
 
-                {/* Nav Links - Center */}
                 <Box
                     sx={{
                         display: {xs: 'none', md: 'flex'},
@@ -118,20 +127,23 @@ const Navbar = ({links = [], onSearch}) => {
                     {navigationLinks.map((link) => (
                         <Typography
                             key={link.label}
-                            component="a"
+                            component={link.to ? RouterLink : 'a'}
+                            to={link.to}
                             href={link.href}
                             onClick={(e) => {
-                                e.preventDefault();
+                                if (!link.to) {
+                                    e.preventDefault();
+                                }
                                 setActiveLink(link.label);
                             }}
                             sx={{
                                 fontWeight: 500,
-                                color: activeLink === link.label ? '#2D2D2D' : '#6B6B6B',
+                                color: isLinkActive(link) ? '#2D2D2D' : '#6B6B6B',
                                 textDecoration: 'none',
                                 cursor: 'pointer',
                                 fontSize: '13px',
                                 paddingBottom: '6px',
-                                borderBottom: activeLink === link.label ? '2px solid #F05E46' : '2px solid transparent',
+                                borderBottom: isLinkActive(link) ? '2px solid #F05E46' : '2px solid transparent',
                                 transition: 'all 0.2s ease',
                                 '&:hover': {
                                     color: '#2D2D2D',
@@ -143,48 +155,48 @@ const Navbar = ({links = [], onSearch}) => {
                     ))}
                 </Box>
 
-                {/* Search */}
-                <Box
-                    component="form"
-                    onSubmit={handleSearchSubmit}
-                    sx={{
-                        display: {xs: 'none', md: 'flex'},
-                        alignItems: 'center',
-                        height: 36,
-                        px: 2,
-                        borderRadius: '18px',
-                        border: '1.5px solid #F05E46',
-                        backgroundColor: 'transparent',
-                        width: 200,
-                        flexShrink: 0,
-                    }}
-                >
-                    <InputBase
+                {showSearch && (
+                    <Box
+                        component="form"
+                        onSubmit={handleSearchSubmit}
                         sx={{
-                            flex: 1,
-                            fontSize: '12.5px',
-                            color: '#F05E46',
-                            '&::placeholder': {
-                                color: '#F05E46',
-                                opacity: 0.7,
-                            }
+                            display: {xs: 'none', md: 'flex'},
+                            alignItems: 'center',
+                            height: 36,
+                            px: 2,
+                            borderRadius: '18px',
+                            border: '1.5px solid #F05E46',
+                            backgroundColor: 'transparent',
+                            width: 200,
+                            flexShrink: 0,
                         }}
-                        placeholder="Pesquisar receitas..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        inputProps={{'aria-label': 'Pesquisar receitas'}}
-                    />
-                    <IconButton
-                        type="submit"
-                        size="small"
-                        sx={{ml: 0.5, p: 0.5, color: '#F05E46'}}
-                        aria-label="Pesquisar"
                     >
-                        <SearchIcon sx={{fontSize: 16}}/>
-                    </IconButton>
-                </Box>
+                        <InputBase
+                            sx={{
+                                flex: 1,
+                                fontSize: '12.5px',
+                                color: '#F05E46',
+                                '&::placeholder': {
+                                    color: '#F05E46',
+                                    opacity: 0.7,
+                                },
+                            }}
+                            placeholder="Pesquisar receitas..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            inputProps={{'aria-label': 'Pesquisar receitas'}}
+                        />
+                        <IconButton
+                            type="submit"
+                            size="small"
+                            sx={{ml: 0.5, p: 0.5, color: '#F05E46'}}
+                            aria-label="Pesquisar"
+                        >
+                            <SearchIcon sx={{fontSize: 16}}/>
+                        </IconButton>
+                    </Box>
+                )}
 
-                {/* Menu Mobile */}
                 <IconButton
                     color="inherit"
                     aria-label="Abrir menu"
@@ -196,7 +208,6 @@ const Navbar = ({links = [], onSearch}) => {
                 </IconButton>
             </Toolbar>
 
-            {/* Drawer Mobile */}
             <Drawer
                 anchor="right"
                 open={mobileOpen}
@@ -212,5 +223,3 @@ const Navbar = ({links = [], onSearch}) => {
 };
 
 export default Navbar;
-
-
