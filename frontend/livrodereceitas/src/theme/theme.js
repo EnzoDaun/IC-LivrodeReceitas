@@ -14,6 +14,11 @@ const theme = createTheme({
             main: '#FF8C42',
             contrastText: '#FFFFFF',
         },
+        sustainable: {
+            main: '#2D4B27',
+            dark: '#243D20',
+            contrastText: '#FFFFFF',
+        },
         text: {
             primary: '#2D2D2D',
             secondary: '#6B6B6B',
