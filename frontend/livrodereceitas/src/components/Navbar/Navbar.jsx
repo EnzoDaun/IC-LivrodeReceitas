@@ -92,7 +92,7 @@ const Navbar = ({links = [], onSearch, initialActiveLink = 'Receitas', showSearc
                     px: 3,
                     py: 1.5,
                     minHeight: '56px !important',
-                    backgroundColor: '#F0EBE1',
+                    backgroundColor: 'background.defaultDark',
                     border: '1.5px solid rgba(0, 0, 0, 0.08)',
                     borderRadius: '16px',
                 }}

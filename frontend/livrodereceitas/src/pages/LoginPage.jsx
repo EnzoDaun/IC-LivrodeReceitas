@@ -13,18 +13,28 @@ const LoginPage = () => {
         <Box
             sx={{
                 position: 'relative',
-                height: '100dvh',
+                minHeight: '100dvh',
                 overflow: 'hidden',
-                backgroundImage: 'url(/assets/LoginPageImg.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
             }}
         >
             <Box
+                aria-hidden="true"
                 sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: 'url(/assets/LoginPageImg.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: {xs: '72% center', md: 'center top'},
+                    backgroundRepeat: 'no-repeat',
+                }}
+            />
+
+            <Box
+                sx={{
+                    position: 'relative',
+                    zIndex: 1,
                     maxWidth: 1100,
-                    height: '100%',
+                    minHeight: '100dvh',
                     mx: 'auto',
                     py: '28px',
                     px: {xs: 2, md: 3},
@@ -50,6 +60,7 @@ const LoginPage = () => {
                     position: 'absolute',
                     right: {xs: 16, md: 24},
                     bottom: {xs: 16, md: 24},
+                    zIndex: 1,
                     width: {xs: 88, sm: 104, md: 120},
                     height: 'auto',
                     filter: 'brightness(0) invert(1)',
