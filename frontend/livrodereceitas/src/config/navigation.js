@@ -1,8 +1,8 @@
 export const primaryNavigationLinks = [
-    {label: 'Receitas', href: '#receitas'},
+    {label: 'Receitas', to: '/receitas'},
     {label: 'E-book', to: '/ebook'},
     {label: 'Mais vistas', href: '#mais-vistas'},
-    {label: 'Favoritas', href: '#favoritas'},
+    {label: 'Favoritas', to: '/favoritas'},
     {label: 'Login', to: '/login'},
     {label: 'Sobre nós', href: '#sobre'},
 ];

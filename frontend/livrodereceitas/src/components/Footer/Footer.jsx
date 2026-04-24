@@ -13,9 +13,9 @@ const sansSerifFont = 'Montserrat, Poppins, sans-serif';
 // Atualize o `to` quando as paginas reais forem criadas.
 // Exemplo: {label: 'RECEITAS', to: '/receitas'}.
 const footerLinks = [
-    {label: 'RECEITAS', to: "/"},
+    {label: 'RECEITAS', to: '/receitas'},
     {label: 'MAIS VISTAS', to: "/"},
-    {label: 'FAVORITAS', to: "/"},
+    {label: 'FAVORITAS', to: '/favoritas'},
     {label: 'SOBRE NOS', to: "/"},
     {label: 'LOGIN', to: '/login'},
 ];
