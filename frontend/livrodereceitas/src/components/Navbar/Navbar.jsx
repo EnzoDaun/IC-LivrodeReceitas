@@ -1,224 +1,136 @@
-import React, {useState} from 'react';
-import {
-    AppBar,
-    Toolbar,
-    Typography,
-    IconButton,
-    InputBase,
-    Box,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-} from '@mui/material';
-import {
-    Search as SearchIcon,
-    Menu as MenuIcon,
-    Close as CloseIcon,
-    MenuBook as MenuBookIcon,
-} from '@mui/icons-material';
-import {Link as RouterLink, useLocation} from 'react-router-dom';
+import React, { useState } from 'react';
+import { Box, Typography, ButtonBase, InputBase } from '@mui/material';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { primaryNavigationLinks } from '../../config/navigation';
 
-const Navbar = ({links = [], onSearch, initialActiveLink = 'Receitas', showSearch = true}) => {
+const NAV_FONT = "'Poppins', Inter, system-ui, sans-serif";
+
+const SearchIcon = () => (
+    <Box
+        component="svg"
+        viewBox="0 0 24 24"
+        sx={{ width: 18, height: 18, flexShrink: 0 }}
+        fill="none"
+        stroke="#F06A57"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <line x1="15.5" y1="15.5" x2="21" y2="21" />
+    </Box>
+);
+
+const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = true }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [activeLink, setActiveLink] = useState(initialActiveLink);
     const location = useLocation();
 
-    const defaultLinks = [
-        {label: 'Receitas', href: '#receitas'},
-        {label: 'Mais vistas', href: '#mais-vistas'},
-        {label: 'Favoritas', href: '#favoritas'},
-        {label: 'Login', to: '/login'},
-        {label: 'Sobre nós', href: '#sobre'},
-    ];
-
-    const navigationLinks = links.length > 0 ? links : defaultLinks;
+    const navigationLinks = (links && links.length > 0) ? links : primaryNavigationLinks;
 
     const isLinkActive = (link) => {
-        if (link.to) {
-            return location.pathname === link.to;
-        }
-
+        if (link.to) return location.pathname === link.to;
         return activeLink === link.label;
     };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        if (onSearch && searchQuery.trim()) {
-            onSearch(searchQuery);
-        }
+        if (onSearch && searchQuery.trim()) onSearch(searchQuery);
     };
-
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
-    const drawer = (
-        <Box sx={{width: 250, pt: 2}}>
-            <Box sx={{display: 'flex', justifyContent: 'flex-end', px: 2, pb: 2}}>
-                <IconButton onClick={handleDrawerToggle} aria-label="Fechar menu">
-                    <CloseIcon/>
-                </IconButton>
-            </Box>
-            <List>
-                {navigationLinks.map((link) => (
-                    <ListItem key={link.label} disablePadding>
-                        <ListItemButton
-                            component={link.to ? RouterLink : 'a'}
-                            to={link.to}
-                            href={link.href}
-                            onClick={() => {
-                                setActiveLink(link.label);
-                                handleDrawerToggle();
-                            }}
-                        >
-                            <ListItemText primary={link.label}/>
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-        </Box>
-    );
 
     return (
-        <AppBar position="static" elevation={0} color="transparent" role="navigation">
-            <Toolbar
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    px: 3,
-                    py: 1.5,
-                    minHeight: '56px !important',
-                    backgroundColor: 'background.defaultDark',
-                    border: '1.5px solid rgba(0, 0, 0, 0.08)',
-                    borderRadius: '16px',
-                }}
-            >
-                <Box sx={{display: 'flex', alignItems: 'center', gap: 1.2, flexShrink: 0}}>
-                    <MenuBookIcon sx={{fontSize: 20, color: '#6B6B6B', strokeWidth: 0.5}}/>
-                    <Typography
-                        variant="body2"
-                        component="div"
-                        sx={{
-                            fontWeight: 500,
-                            fontSize: '13px',
-                            color: '#2D2D2D',
-                            lineHeight: 1.25,
-                            display: {xs: 'none', sm: 'block'},
-                            maxWidth: '85px',
-                        }}
-                    >
-                        Livro de receitas
-                    </Typography>
-                </Box>
+        <Box sx={{ width: '100%', boxSizing: 'border-box', backgroundColor: 'transparent', pt: '6px', px: '1px' }}>
+            <Box sx={{
+                width: '100%',
+                height: '47px',
+                border: '1px solid #BEB7AC',
+                borderRadius: '24px',
+                backgroundColor: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: '16px',
+                boxSizing: 'border-box',
+            }}>
 
-                <Box
-                    sx={{
-                        display: {xs: 'none', md: 'flex'},
-                        gap: 3.5,
-                        alignItems: 'center',
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                    }}
-                >
-                    {navigationLinks.map((link) => (
-                        <Typography
-                            key={link.label}
-                            component={link.to ? RouterLink : 'a'}
-                            to={link.to}
-                            href={link.href}
-                            onClick={(e) => {
-                                if (!link.to) {
-                                    e.preventDefault();
-                                }
-                                setActiveLink(link.label);
-                            }}
-                            sx={{
-                                fontWeight: 500,
-                                color: isLinkActive(link) ? '#2D2D2D' : '#6B6B6B',
-                                textDecoration: 'none',
-                                cursor: 'pointer',
-                                fontSize: '13px',
-                                paddingBottom: '6px',
-                                borderBottom: isLinkActive(link) ? '2px solid #F05E46' : '2px solid transparent',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    color: '#2D2D2D',
-                                },
-                            }}
-                        >
-                            {link.label}
+                {/* ── LOGO ── */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, minWidth: '120px' }}>
+                    <Box component="img" src="/assets/logo.png" alt="Livro de Receitas logo" sx={{ width: 36, height: 36, objectFit: 'contain' }} />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                        <Typography sx={{ fontFamily: NAV_FONT, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
+                            Livro de
                         </Typography>
-                    ))}
+                        <Typography sx={{ fontFamily: NAV_FONT, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
+                            receitas
+                        </Typography>
+                    </Box>
                 </Box>
 
+                {/* ── NAVEGAÇÃO ── */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '30px', flexGrow: 1, justifyContent: 'center' }}>
+                    {navigationLinks.map((link) => {
+                        const active = isLinkActive(link);
+                        return (
+                            <ButtonBase
+                                key={link.label}
+                                component={link.to ? RouterLink : 'a'}
+                                to={link.to}
+                                href={link.href}
+                                disableRipple
+                                onClick={() => { if (!link.to) setActiveLink(link.label); }}
+                                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textDecoration: 'none', p: 0 }}
+                            >
+                                <Typography sx={{
+                                    fontFamily: NAV_FONT,
+                                    fontSize: '10px',
+                                    fontWeight: active ? 600 : 500,
+                                    color: active ? '#2A2622' : '#9A958D',
+                                    textTransform: 'uppercase',
+                                    lineHeight: '12px',
+                                    letterSpacing: '0.2px',
+                                    whiteSpace: 'nowrap',
+                                }}>
+                                    {link.label}
+                                </Typography>
+                                {active && <Box sx={{ width: '100%', height: '2px', backgroundColor: '#F06A57', borderRadius: '1px' }} />}
+                            </ButtonBase>
+                        );
+                    })}
+                </Box>
+
+                {/* ── BUSCA ── */}
                 {showSearch && (
                     <Box
                         component="form"
                         onSubmit={handleSearchSubmit}
                         sx={{
-                            display: {xs: 'none', md: 'flex'},
-                            alignItems: 'center',
-                            height: 36,
-                            px: 2,
-                            borderRadius: '18px',
-                            border: '1.5px solid #F05E46',
+                            width: '190px', height: '28px',
+                            border: '1px solid #F06A57', borderRadius: '999px',
                             backgroundColor: 'transparent',
-                            width: 200,
-                            flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            pl: '14px', pr: '10px', boxSizing: 'border-box', flexShrink: 0,
                         }}
                     >
                         <InputBase
-                            sx={{
-                                flex: 1,
-                                fontSize: '12.5px',
-                                color: '#F05E46',
-                                '&::placeholder': {
-                                    color: '#F05E46',
-                                    opacity: 0.7,
-                                },
-                            }}
                             placeholder="Pesquisar receitas..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            inputProps={{'aria-label': 'Pesquisar receitas'}}
+                            inputProps={{ 'aria-label': 'Pesquisar receitas' }}
+                            sx={{
+                                flex: 1, fontFamily: NAV_FONT, fontSize: '12px', fontWeight: 400, fontStyle: 'italic', color: '#F06A57',
+                                '& input': {
+                                    p: 0, fontFamily: NAV_FONT, fontSize: '12px', fontStyle: 'italic', color: '#F06A57',
+                                    '&::placeholder': { color: '#F06A57', opacity: 1 },
+                                },
+                            }}
                         />
-                        <IconButton
-                            type="submit"
-                            size="small"
-                            sx={{ml: 0.5, p: 0.5, color: '#F05E46'}}
-                            aria-label="Pesquisar"
-                        >
-                            <SearchIcon sx={{fontSize: 16}}/>
-                        </IconButton>
+                        <ButtonBase type="submit" disableRipple sx={{ p: 0, ml: '6px', display: 'flex', alignItems: 'center' }}>
+                            <SearchIcon />
+                        </ButtonBase>
                     </Box>
                 )}
-
-                <IconButton
-                    color="inherit"
-                    aria-label="Abrir menu"
-                    aria-expanded={mobileOpen}
-                    onClick={handleDrawerToggle}
-                    sx={{color: 'text.primary', display: {xs: 'flex', md: 'none'}}}
-                >
-                    <MenuIcon/>
-                </IconButton>
-            </Toolbar>
-
-            <Drawer
-                anchor="right"
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{
-                    keepMounted: true,
-                }}
-            >
-                {drawer}
-            </Drawer>
-        </AppBar>
+            </Box>
+        </Box>
     );
 };
 

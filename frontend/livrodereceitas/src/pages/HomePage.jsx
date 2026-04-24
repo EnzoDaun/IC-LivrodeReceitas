@@ -5,6 +5,9 @@ import Hero from '../components/Hero/Hero';
 import FeaturedRecipes from '../components/FeaturedRecipes/FeaturedRecipes';
 import {sampleRecipes} from '../data/sampleRecipes';
 import {primaryNavigationLinks} from '../config/navigation';
+import Journey from '../components/journey/Journey';
+import AboutSection from '../components/AboutSection/AboutSection';
+import Footer from '../components/Footer/Footer'
 
 const HomePage = () => {
     const handleSearch = (query) => {
@@ -42,13 +45,18 @@ const HomePage = () => {
                 ctaText="Explorar Receitas"
                 onCtaClick={handleCtaClick}
             />
+           
             <Box id="receitas">
                 <FeaturedRecipes
                     recipes={sampleRecipes}
                     onViewRecipe={handleViewRecipe}
                 />
             </Box>
+            <Journey />
+            <AboutSection />
+            <Footer />
         </Box>
+        
     );
 };
 

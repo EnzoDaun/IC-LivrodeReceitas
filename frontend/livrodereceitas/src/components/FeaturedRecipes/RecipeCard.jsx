@@ -1,210 +1,158 @@
-import React, {useState} from 'react';
-import {
-    Card,
-    CardMedia,
-    CardContent,
-    Typography,
-    Button,
-    Box,
-    IconButton,
-    Tooltip,
-    Rating,
-} from '@mui/material';
-import {
-    Favorite as FavoriteIcon,
-    FavoriteBorder as FavoriteBorderIcon,
-} from '@mui/icons-material';
+import React, { useState } from 'react';
+import { Box, Typography, Button } from '@mui/material';
 
-const RecipeCard = ({recipe, onView, onToggleFavorite}) => {
+const FONT = "'Poppins', Inter, system-ui, sans-serif";
+
+const HeartIcon = ({ filled }) => (
+    <Box
+        component="svg"
+        viewBox="0 0 24 24"
+        sx={{ width: 21, height: 21, flexShrink: 0, cursor: 'pointer' }}
+        fill={filled ? '#F05E46' : 'none'}
+        stroke={filled ? '#F05E46' : '#111111'}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </Box>
+);
+
+const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
     const [isFavorite, setIsFavorite] = useState(false);
-    const [imageError, setImageError] = useState(false);
 
     const handleFavoriteClick = () => {
-        setIsFavorite(!isFavorite);
-        if (onToggleFavorite) {
-            onToggleFavorite(recipe.id, !isFavorite);
-        }
+        const next = !isFavorite;
+        setIsFavorite(next);
+        if (onToggleFavorite) onToggleFavorite(recipe.id, next);
     };
 
     const handleViewClick = () => {
-        if (onView) {
-            onView(recipe.id);
-        }
+        if (onView) onView(recipe.id);
     };
 
-    const defaultImage = 'https://via.placeholder.com/400x300/F0EBE1/F05E46?text=Receita';
-
     return (
-        <Card
-            sx={{
-                borderRadius: '20px',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                border: '1px solid rgba(0,0,0,0.04)',
-                height: '100%',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                },
-            }}
-        >
-            {/* Imagem com botão de favorito */}
-            <Box sx={{position: 'relative'}}>
-                <CardMedia
+        <Box sx={{
+            width: '100%',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            backgroundColor: '#FFFBF2',
+            display: 'flex',
+            flexDirection: 'column',
+        }}>
+            {/* Imagem */}
+            <Box sx={{ width: '100%', height: '190px', flexShrink: 0, overflow: 'hidden' }}>
+                <Box
                     component="img"
-                    height="220"
-                    image={imageError ? defaultImage : recipe.imageUrl}
+                    src={recipe.imageUrl}
                     alt={recipe.title}
-                    loading="lazy"
-                    onError={() => setImageError(true)}
                     sx={{
                         width: '100%',
-                        height: 220,
+                        height: '190px',
                         objectFit: 'cover',
+                        objectPosition: 'center',
                         display: 'block',
                     }}
                 />
-
-                {/* Botão de favoritar */}
-                <Tooltip title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>
-                    <IconButton
-                        onClick={handleFavoriteClick}
-                        aria-pressed={isFavorite}
-                        aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                        sx={{
-                            position: 'absolute',
-                            top: 14,
-                            right: 14,
-                            backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                            width: 36,
-                            height: 36,
-                            border: '1px solid rgba(0,0,0,0.08)',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                                transform: 'scale(1.08)',
-                            },
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        {isFavorite ? (
-                            <FavoriteIcon sx={{color: '#F05E46', fontSize: 19}}/>
-                        ) : (
-                            <FavoriteBorderIcon sx={{color: '#7A7A7A', fontSize: 19}}/>
-                        )}
-                    </IconButton>
-                </Tooltip>
             </Box>
 
             {/* Conteúdo */}
-            <CardContent sx={{pt: 2.5, pb: 1.5, px: 2.5, flexGrow: 1}}>
-                <Typography
-                    variant="h6"
-                    component="h3"
-                    sx={{
-                        fontWeight: 700,
-                        fontSize: '17px',
-                        mb: 1,
-                        color: '#2D2D2D',
-                        lineHeight: 1.3,
-                    }}
-                >
-                    {recipe.title}
-                </Typography>
+            <Box sx={{ px: '14px', pt: '13px', pb: '12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-                <Typography
-                    variant="body2"
-                    sx={{
-                        fontSize: '13px',
-                        color: '#6B6B6B',
-                        lineHeight: 1.55,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                    }}
-                >
+                {/* Título + coração */}
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: '8px' }}>
+                    <Typography sx={{
+                        fontFamily: FONT,
+                        fontSize: '18px',
+                        fontWeight: 800,
+                        color: '#262626',
+                        lineHeight: '22px',
+                    }}>
+                        {recipe.title}
+                    </Typography>
+                    <Box onClick={handleFavoriteClick} sx={{ ml: '8px', mt: '1px' }}>
+                        <HeartIcon filled={isFavorite} />
+                    </Box>
+                </Box>
+
+                {/* Descrição */}
+                <Typography sx={{
+                    fontFamily: FONT,
+                    fontSize: '12px',
+                    fontWeight: 400,
+                    color: '#6B6B6B',
+                    lineHeight: '17px',
+                    flex: 1,
+                }}>
                     {recipe.excerpt}
                 </Typography>
-            </CardContent>
 
-            {/* Rodapé*/}
-            <Box
-                sx={{
+                {/* Rodapé */}
+                <Box sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    px: 2.5,
-                    pb: 2.5,
-                    gap: 2,
-                }}
-            >
-                {/* Estrelas */}
-                <Rating
-                    value={recipe.rating}
-                    precision={0.5}
-                    readOnly
-                    size="small"
-                    sx={{
-                        flexShrink: 0,
-                        '& .MuiRating-iconFilled': {
-                            color: '#FFB940',
-                        },
-                        '& .MuiRating-icon': {
-                            fontSize: '17px',
-                        },
-                    }}
-                />
+                    justifyContent: 'space-between',
+                    mt: '12px',
+                }}>
+                    {/* Estrelas */}
+                    <Typography sx={{
+                        fontFamily: FONT,
+                        fontSize: '17px',
+                        fontWeight: 700,
+                        color: '#FFC928',
+                        letterSpacing: '0px',
+                        lineHeight: 1,
+                    }}>
+                        ★★★★★
+                    </Typography>
 
-                <Typography
-                    variant="caption"
-                    sx={{
+                    {/* Meta */}
+                    <Typography sx={{
+                        fontFamily: FONT,
                         fontSize: '10px',
-                        letterSpacing: 0.2,
-                        color: '#2D2D2D',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        flexShrink: 0,
+                        fontWeight: 800,
+                        color: '#222222',
+                        lineHeight: '13px',
                         whiteSpace: 'nowrap',
-                    }}
-                >
-                    {recipe.time} - {recipe.difficulty} - {recipe.portions}
-                </Typography>
-
-                {/* Botão */}
-                <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleViewClick}
-                    aria-label="Ver receita"
-                    sx={{
-                        borderRadius: '16px',
-                        px: 2,
-                        py: 0.75,
                         textTransform: 'uppercase',
-                        fontWeight: 600,
-                        fontSize: '11px',
-                        letterSpacing: '0.3px',
-                        borderColor: '#2D2D2D',
-                        color: '#2D2D2D',
-                        backgroundColor: '#FFFFFF',
-                        flexShrink: 0,
-                        minWidth: 'auto',
-                        '&:hover': {
-                            borderColor: '#2D2D2D',
-                            backgroundColor: 'rgba(45, 45, 45, 0.04)',
-                        },
-                    }}
-                >
-                    VER RECEITA
-                </Button>
+                    }}>
+                        {recipe.time} · {recipe.difficulty} · {recipe.portions}
+                    </Typography>
+
+                    {/* Botão */}
+                    <Button
+                        variant="outlined"
+                        onClick={handleViewClick}
+                        disableElevation
+                        disableRipple
+                        sx={{
+                            width: '82px',
+                            height: '26px',
+                            borderRadius: '999px',
+                            border: '1px solid #222222',
+                            backgroundColor: 'transparent',
+                            color: '#222222',
+                            fontFamily: FONT,
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.2px',
+                            minWidth: 'unset',
+                            p: 0,
+                            boxShadow: 'none',
+                            '&:hover': {
+                                backgroundColor: 'rgba(34,34,34,0.05)',
+                                border: '1px solid #222222',
+                                boxShadow: 'none',
+                            },
+                        }}
+                    >
+                        VER RECEITA
+                    </Button>
+                </Box>
             </Box>
-        </Card>
+        </Box>
     );
 };
 
 export default RecipeCard;
-

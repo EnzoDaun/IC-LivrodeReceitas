@@ -1,11 +1,12 @@
 import React from 'react';
-import {ThemeProvider, CssBaseline, Box} from '@mui/material';
+import {ThemeProvider, CssBaseline, GlobalStyles, Box} from '@mui/material';
 import theme from './theme/theme';
 import AppRoutes from './routes/AppRoutes';
 
 function App() {
     return (
         <ThemeProvider theme={theme}>
+            <GlobalStyles styles={`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');`} />
             <CssBaseline/>
             <Box
                 sx={{

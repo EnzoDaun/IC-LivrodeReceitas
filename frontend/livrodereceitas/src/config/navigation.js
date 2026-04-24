@@ -6,3 +6,13 @@ export const primaryNavigationLinks = [
     {label: 'Login', to: '/login'},
     {label: 'Sobre nós', href: '#sobre'},
 ];
+
+export const journeyFilters = [
+    'TODAS',
+    'VEGAN',
+    'SOBREMESAS',
+    'ALMOÇO',
+    'JANTA',
+    'CAFÉ DA MANHÃ',
+    'LANCHINHOS RÁPIDOS',
+];

@@ -1,134 +1,160 @@
-import React, {useState} from 'react';
-import {
-    Box,
-    Typography,
-    IconButton,
-    Paper,
-} from '@mui/material';
-import {
-    StarBorder as StarBorderIcon,
-    ArrowBackIos as ArrowBackIcon,
-    ArrowForwardIos as ArrowForwardIcon,
-} from '@mui/icons-material';
+import React from 'react';
+import { Box, Typography } from '@mui/material';
 import RecipeCard from './RecipeCard';
 
+const FONT = "'Poppins', Inter, system-ui, sans-serif";
+
+const StarIcon = () => (
+    <Box
+        component="svg"
+        viewBox="0 0 24 24"
+        sx={{ width: 23, height: 23, flexShrink: 0 }}
+        fill="none"
+        stroke="#111111"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </Box>
+);
+
+const ChevronLeft = () => (
+    <Box
+        component="svg"
+        viewBox="0 0 24 24"
+        sx={{ width: 11, height: 11 }}
+        fill="none"
+        stroke="#C9C0B4"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <polyline points="15 18 9 12 15 6" />
+    </Box>
+);
+
+const ChevronRight = () => (
+    <Box
+        component="svg"
+        viewBox="0 0 24 24"
+        sx={{ width: 11, height: 11 }}
+        fill="none"
+        stroke="#111111"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <polyline points="9 18 15 12 9 6" />
+    </Box>
+);
+
 const FeaturedRecipes = ({
-                             recipes,
-                             onViewRecipe,
-                             title = 'RECEITAS EM DESTAQUE',
-                         }) => {
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
+    recipes,
+    onViewRecipe,
+    title = 'RECEITAS EM DESTAQUE',
+}) => {
+    const canScrollLeft = false;
+    const canScrollRight = true;
 
     const handleToggleFavorite = (recipeId, isFavorite) => {
-        console.log(`Recipe ${recipeId} favorite status:`, isFavorite);
+        console.log(`Recipe ${recipeId} favorite:`, isFavorite);
     };
 
+    const displayed = recipes ? recipes.slice(0, 2) : [];
+
     return (
-        <Paper
-            elevation={0}
-            sx={{
-                mt: 4,
-                borderRadius: '24px',
-                p: {xs: 3, md: 4},
+        <Box sx={{
+            width: '100%',
+            backgroundColor: 'transparent',
+            boxSizing: 'border-box',
+            mt: '16px',
+        }}>
+            {/* Container principal */}
+            <Box sx={{
+                width: '100%',
+                border: '1px solid #C9C0B4',
+                borderRadius: '19px',
                 backgroundColor: 'transparent',
-                border: '1.5px solid rgba(0, 0, 0, 0.08)',
-                boxShadow: 'none',
-            }}
-        >
-            {/* Cabeçalho */}
-            <Box
-                sx={{
+                boxSizing: 'border-box',
+                p: '20px 16px 16px 16px',
+                position: 'relative',
+            }}>
+                {/* Cabeçalho */}
+                <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    mb: 3.5,
-                }}
-            >
-                <Box sx={{display: 'flex', alignItems: 'center', gap: 1.25}}>
-                    <StarBorderIcon sx={{color: '#2D2D2D', fontSize: 24, strokeWidth: 0.5}}/>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            fontWeight: 700,
-                            fontSize: {xs: '18px', sm: '20px'},
-                            letterSpacing: '0.8px',
-                            color: '#2D2D2D',
-                        }}
-                    >
-                        {title}
-                    </Typography>
+                    mb: '18px',
+                }}>
+                    {/* Título com estrela */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                        <StarIcon />
+                        <Typography sx={{
+                            fontFamily: FONT,
+                            fontSize: '26px',
+                            fontWeight: 800,
+                            color: '#282828',
+                            lineHeight: '30px',
+                            letterSpacing: '0.2px',
+                            whiteSpace: 'nowrap',
+                        }}>
+                            {title}
+                        </Typography>
+                    </Box>
+
+                    {/* Setas de navegação */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Box
+                            sx={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                border: `1px solid ${canScrollLeft ? '#111111' : '#C9C0B4'}`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: canScrollLeft ? 'pointer' : 'default',
+                                backgroundColor: 'transparent',
+                            }}
+                        >
+                            <ChevronLeft />
+                        </Box>
+                        <Box
+                            sx={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                border: `1px solid ${canScrollRight ? '#111111' : '#C9C0B4'}`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: canScrollRight ? 'pointer' : 'default',
+                                backgroundColor: 'transparent',
+                            }}
+                        >
+                            <ChevronRight />
+                        </Box>
+                    </Box>
                 </Box>
 
-                {/* Botões de navegação */}
-                <Box sx={{display: 'flex', gap: 1}}>
-                    <IconButton
-                        disabled={!canScrollLeft}
-                        size="small"
-                        aria-label="Receita anterior"
-                        sx={{
-                            border: '1px solid rgba(0,0,0,0.08)',
-                            width: 34,
-                            height: 34,
-                            borderRadius: '17px',
-                            background: 'rgba(255,255,255,0.9)',
-                            '&:hover': {
-                                background: 'rgba(255,255,255,1)',
-                                transform: 'scale(1.05)',
-                            },
-                            '&:disabled': {
-                                opacity: 0.35,
-                                background: 'rgba(255,255,255,0.6)',
-                            },
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <ArrowBackIcon sx={{fontSize: 14, color: 'rgba(0,0,0,0.5)'}}/>
-                    </IconButton>
-                    <IconButton
-                        disabled={!canScrollRight}
-                        size="small"
-                        aria-label="Próxima receita"
-                        sx={{
-                            border: '1px solid rgba(0,0,0,0.08)',
-                            width: 34,
-                            height: 34,
-                            borderRadius: '17px',
-                            background: 'rgba(255,255,255,0.9)',
-                            '&:hover': {
-                                background: 'rgba(255,255,255,1)',
-                                transform: 'scale(1.05)',
-                            },
-                            '&:disabled': {
-                                opacity: 0.35,
-                                background: 'rgba(255,255,255,0.6)',
-                            },
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <ArrowForwardIcon sx={{fontSize: 14, color: 'rgba(0,0,0,0.5)'}}/>
-                    </IconButton>
-                </Box>
-            </Box>
-
-            {/* Grid de Cards */}
-            <Box
-                sx={{
+                {/* Cards */}
+                <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: {xs: '1fr', md: 'repeat(2, 1fr)'},
-                    gap: 3,
-                }}
-            >
-                {recipes.slice(0, 2).map((recipe) => (
-                    <RecipeCard
-                        key={recipe.id}
-                        recipe={recipe}
-                        onView={onViewRecipe}
-                        onToggleFavorite={handleToggleFavorite}
-                    />
-                ))}
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '10px',
+                }}>
+                    {displayed.map((recipe) => (
+                        <RecipeCard
+                            key={recipe.id}
+                            recipe={recipe}
+                            onView={onViewRecipe}
+                            onToggleFavorite={handleToggleFavorite}
+                        />
+                    ))}
+                </Box>
             </Box>
-        </Paper>
+        </Box>
     );
 };
 
