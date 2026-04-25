@@ -58,7 +58,7 @@ const Login = () => {
                     maxHeight: '541px',
                     p: {xs: 3, sm: 4.5, md: 5},
                     borderRadius: '16px',
-                    backgroundColor: 'rgba(250, 250, 250, 0.76)',
+                    backgroundColor: 'rgba(240, 235, 235, 0.8)',
                     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
                     border: '1px solid rgba(255, 255, 255, 0.35)',
                 }}

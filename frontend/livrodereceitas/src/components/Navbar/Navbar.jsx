@@ -45,7 +45,7 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                 height: '47px',
                 border: '1px solid #BEB7AC',
                 borderRadius: '24px',
-                backgroundColor: 'transparent',
+                backgroundColor: 'background.default',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
