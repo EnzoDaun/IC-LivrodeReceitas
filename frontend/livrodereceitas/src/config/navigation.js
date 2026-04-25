@@ -4,7 +4,7 @@ export const primaryNavigationLinks = [
     {label: 'Mais vistas', href: '#mais-vistas'},
     {label: 'Favoritas', to: '/favoritas'},
     {label: 'Login', to: '/login'},
-    {label: 'Sobre nós', href: '#sobre'},
+    {label: 'Sobre nós', to: '/sobre'},
 ];
 
 export const journeyFilters = [

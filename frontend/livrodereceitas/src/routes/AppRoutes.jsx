@@ -6,6 +6,7 @@ import EbookPage from '../pages/EbookPage';
 import FavoritesPage from '../pages/FavoritesPage';
 import ChefDashboardPage from '../pages/ChefDashboardPage';
 import AddRecipePage from '../pages/AddRecipePage';
+import SobreNosPage from '../pages/SobreNosPage';
 
 const AppRoutes = () => {
     return (
@@ -16,6 +17,7 @@ const AppRoutes = () => {
             <Route path="/favoritas" element={<FavoritesPage/>}/>
             <Route path="/receitas" element={<ChefDashboardPage/>}/>
             <Route path="/receitas/adicionar" element={<AddRecipePage/>}/>
+            <Route path="/sobre" element={<SobreNosPage/>}/>
             <Route path="*" element={<Navigate to="/" replace/>}/>
         </Routes>
     );

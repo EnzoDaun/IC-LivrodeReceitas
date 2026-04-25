@@ -16,7 +16,7 @@ const footerLinks = [
     {label: 'RECEITAS', to: '/receitas'},
     {label: 'MAIS VISTAS', to: "/"},
     {label: 'FAVORITAS', to: '/favoritas'},
-    {label: 'SOBRE NOS', to: "/"},
+    {label: 'SOBRE NOS', to: "/sobre"},
     {label: 'LOGIN', to: '/login'},
 ];
 
