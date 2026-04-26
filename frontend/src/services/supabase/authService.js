@@ -1,4 +1,12 @@
 import { requireSupabase } from '@/lib/supabase/client';
+import {
+    normalizeEmail,
+    normalizeSpaces,
+    validateEmail,
+    validateFullName,
+    validatePasswordForLogin,
+    validatePasswordForRegister,
+} from '@/utils/validation';
 
 export async function getSession() {
     const client = requireSupabase();
@@ -11,8 +19,15 @@ export async function getSession() {
 
 export async function signInWithPassword({ email, password }) {
     const client = requireSupabase();
+    const emailError = validateEmail(email);
+    const passwordError = validatePasswordForLogin(password);
+
+    if (emailError || passwordError) {
+        throw new Error(emailError || passwordError);
+    }
+
     const { data, error } = await client.auth.signInWithPassword({
-        email,
+        email: normalizeEmail(email),
         password,
     });
 
@@ -23,12 +38,20 @@ export async function signInWithPassword({ email, password }) {
 
 export async function signUpWithPassword({ email, password, fullName }) {
     const client = requireSupabase();
+    const emailError = validateEmail(email);
+    const passwordError = validatePasswordForRegister(password);
+    const fullNameError = validateFullName(fullName);
+
+    if (emailError || passwordError || fullNameError) {
+        throw new Error(emailError || passwordError || fullNameError);
+    }
+
     const { data, error } = await client.auth.signUp({
-        email,
+        email: normalizeEmail(email),
         password,
         options: {
             data: {
-                full_name: fullName,
+                full_name: normalizeSpaces(fullName),
             },
         },
     });
@@ -40,7 +63,13 @@ export async function signUpWithPassword({ email, password, fullName }) {
 
 export async function resetPasswordForEmail(email) {
     const client = requireSupabase();
-    const { error } = await client.auth.resetPasswordForEmail(email, {
+    const emailError = validateEmail(email);
+
+    if (emailError) {
+        throw new Error(emailError);
+    }
+
+    const { error } = await client.auth.resetPasswordForEmail(normalizeEmail(email), {
         redirectTo: window.location.origin,
     });
 

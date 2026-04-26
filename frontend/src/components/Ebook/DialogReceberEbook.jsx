@@ -1,15 +1,25 @@
-import { FONT_SANS } from '@/config/constants/styles';
 import React, { useState } from 'react';
 import {
-    Box, Button, Dialog, DialogActions, DialogContent,
-    DialogTitle, IconButton, TextField, Typography,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    TextField,
+    Typography,
 } from '@mui/material';
 import {
     CheckCircleOutline as CheckCircleIcon,
     Close as CloseIcon,
 } from '@mui/icons-material';
-
-
+import { FONT_SANS } from '@/config/constants/styles';
+import {
+    VALIDATION_LIMITS,
+    normalizeEmail,
+    validateEmail,
+} from '@/utils/validation';
 
 const DialogReceberEbook = ({ open, onClose }) => {
     const [email, setEmail] = useState('');
@@ -21,16 +31,15 @@ const DialogReceberEbook = ({ open, onClose }) => {
     };
 
     const handleSend = () => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email.trim()) {
-            setEmailError('Informe seu e-mail para receber o e-book.');
+        const nextEmailError = validateEmail(email);
+
+        if (nextEmailError) {
+            setEmailError(nextEmailError);
             return;
         }
-        if (!emailRegex.test(email)) {
-            setEmailError('Informe um e-mail válido.');
-            return;
-        }
+
         setEmailError('');
+        setEmail(normalizeEmail(email));
         setSent(true);
     };
 
@@ -81,13 +90,18 @@ const DialogReceberEbook = ({ open, onClose }) => {
                             type="email"
                             placeholder="seu@email.com"
                             value={email}
-                            onChange={(e) => {
-                                setEmail(e.target.value);
+                            onChange={(event) => {
+                                setEmail(event.target.value.slice(0, VALIDATION_LIMITS.emailMax));
                                 setEmailError('');
                             }}
                             error={!!emailError}
                             helperText={emailError}
                             size="small"
+                            slotProps={{
+                                htmlInput: {
+                                    maxLength: VALIDATION_LIMITS.emailMax,
+                                },
+                            }}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     borderRadius: '10px',

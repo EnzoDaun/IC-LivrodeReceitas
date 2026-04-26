@@ -1,6 +1,16 @@
 import { requireSupabase } from '@/lib/supabase/client';
+import {
+    VALIDATION_LIMITS,
+    getFirstValidationMessage,
+    normalizeSpaces,
+    validateCategoryName,
+    validateImageFiles,
+    validateIntegerRange,
+    validateRequiredText,
+} from '@/utils/validation';
 
 const DEFAULT_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'recipe-images';
+const DIFFICULTY_OPTIONS = ['Fácil', 'Médio', 'Difícil'];
 const RECIPE_SELECT = `
     id,
     author_id,
@@ -34,7 +44,7 @@ const RECIPE_SELECT = `
 
 function normalizeOrder(items) {
     return items
-        .map((item) => item.trim())
+        .map(normalizeSpaces)
         .filter(Boolean)
         .map((item, index) => ({
             content: item,
@@ -43,7 +53,72 @@ function normalizeOrder(items) {
 }
 
 function normalizeCategoryName(name) {
-    return name.trim().replace(/\s+/g, ' ');
+    return normalizeSpaces(name);
+}
+
+function validateRecipePayload({
+    title,
+    description,
+    category,
+    difficulty,
+    prepTimeMinutes,
+    portions,
+    ingredients,
+    instructions,
+    files,
+}) {
+    const normalizedIngredients = (ingredients || []).map(normalizeSpaces).filter(Boolean);
+    const normalizedInstructions = (instructions || []).map(normalizeSpaces).filter(Boolean);
+    const ingredientErrors = normalizedIngredients.map((ingredient, index) => (
+        validateRequiredText(ingredient, {
+            label: `o ingrediente ${index + 1}`,
+            min: VALIDATION_LIMITS.ingredientMin,
+            max: VALIDATION_LIMITS.ingredientMax,
+        })
+    ));
+    const instructionErrors = normalizedInstructions.map((instruction, index) => (
+        validateRequiredText(instruction, {
+            label: `a instrucao ${index + 1}`,
+            min: VALIDATION_LIMITS.stepMin,
+            max: VALIDATION_LIMITS.stepMax,
+        })
+    ));
+    const errors = {
+        title: validateRequiredText(title, {
+            label: 'o titulo da receita',
+            min: VALIDATION_LIMITS.recipeTitleMin,
+            max: VALIDATION_LIMITS.recipeTitleMax,
+        }),
+        description: validateRequiredText(description, {
+            label: 'a descricao da receita',
+            min: VALIDATION_LIMITS.recipeDescriptionMin,
+            max: VALIDATION_LIMITS.recipeDescriptionMax,
+        }),
+        category: validateCategoryName(category),
+        difficulty: DIFFICULTY_OPTIONS.includes(difficulty) ? '' : 'Selecione uma dificuldade: Fácil, Médio ou Difícil.',
+        prepTimeMinutes: validateIntegerRange(prepTimeMinutes, {
+            label: 'o tempo de preparo',
+            min: VALIDATION_LIMITS.prepTimeMin,
+            max: VALIDATION_LIMITS.prepTimeMax,
+        }),
+        portions: validateIntegerRange(portions, {
+            label: 'as porcoes',
+            min: VALIDATION_LIMITS.portionsMin,
+            max: VALIDATION_LIMITS.portionsMax,
+        }),
+        files: validateImageFiles(files || []),
+        ingredients: normalizedIngredients.length > 0
+            ? ingredientErrors.find(Boolean) || ''
+            : 'Informe pelo menos um ingrediente.',
+        instructions: normalizedInstructions.length > 0
+            ? instructionErrors.find(Boolean) || ''
+            : 'Informe pelo menos uma instrucao.',
+    };
+    const validationMessage = getFirstValidationMessage(errors);
+
+    if (validationMessage) {
+        throw new Error(validationMessage);
+    }
 }
 
 export async function listRecipeCategories() {
@@ -64,6 +139,12 @@ export async function createRecipeCategory(name) {
 
     if (!categoryName) {
         throw new Error('Informe o nome da categoria.');
+    }
+
+    const validationMessage = validateCategoryName(categoryName);
+
+    if (validationMessage) {
+        throw new Error(validationMessage);
     }
 
     const { data, error } = await client
@@ -99,6 +180,12 @@ export async function updateRecipeCategory({ categoryId, name }) {
 
     if (!categoryName) {
         throw new Error('Informe o nome da categoria.');
+    }
+
+    const validationMessage = validateCategoryName(categoryName);
+
+    if (validationMessage) {
+        throw new Error(validationMessage);
     }
 
     const { data, error } = await client
@@ -348,14 +435,25 @@ export async function createRecipe({
     files,
 }) {
     const client = requireSupabase();
+    validateRecipePayload({
+        title,
+        description,
+        category,
+        difficulty,
+        prepTimeMinutes,
+        portions,
+        ingredients,
+        instructions,
+        files,
+    });
 
     const { data: recipe, error: recipeError } = await client
         .from('recipes')
         .insert({
             author_id: authorId,
-            title,
-            description,
-            category,
+            title: normalizeSpaces(title),
+            description: normalizeSpaces(description),
+            category: normalizeCategoryName(category),
             difficulty,
             prep_time_minutes: prepTimeMinutes,
             portions,
@@ -413,6 +511,17 @@ export async function updateRecipe({
     files,
 }) {
     const client = requireSupabase();
+    validateRecipePayload({
+        title,
+        description,
+        category,
+        difficulty,
+        prepTimeMinutes,
+        portions,
+        ingredients,
+        instructions,
+        files,
+    });
     const normalizedIngredients = normalizeOrder(ingredients).map((item) => ({
         recipe_id: recipeId,
         ...item,
@@ -432,9 +541,9 @@ export async function updateRecipe({
     const { error: recipeError } = await client
         .from('recipes')
         .update({
-            title,
-            description,
-            category,
+            title: normalizeSpaces(title),
+            description: normalizeSpaces(description),
+            category: normalizeCategoryName(category),
             difficulty,
             prep_time_minutes: prepTimeMinutes,
             portions,

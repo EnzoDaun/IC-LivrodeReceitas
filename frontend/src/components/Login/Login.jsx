@@ -13,6 +13,16 @@ import {
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import {
+    VALIDATION_LIMITS,
+    getFirstValidationMessage,
+    normalizeEmail,
+    normalizeSpaces,
+    validateEmail,
+    validateFullName,
+    validatePasswordForLogin,
+    validatePasswordForRegister,
+} from '@/utils/validation';
 
 const inputStyles = {
     '& .MuiOutlinedInput-root': {
@@ -59,6 +69,7 @@ const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [localError, setLocalError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -71,6 +82,7 @@ const Login = () => {
         clearAuthError();
         setLocalError('');
         setFeedbackMessage('');
+        setFieldErrors({});
     };
 
     const handleModeChange = (nextMode) => {
@@ -82,26 +94,42 @@ const Login = () => {
         event.preventDefault();
         resetMessages();
 
+        const nextErrors = {
+            email: validateEmail(email),
+            fullName: mode === 'register' ? validateFullName(fullName) : '',
+            password: mode === 'register'
+                ? validatePasswordForRegister(password)
+                : (mode === 'login' ? validatePasswordForLogin(password) : ''),
+        };
+        const validationMessage = getFirstValidationMessage(nextErrors);
+
+        if (validationMessage) {
+            setFieldErrors(nextErrors);
+            setLocalError(validationMessage);
+            return;
+        }
+
         try {
             setIsSubmitting(true);
+            const normalizedEmail = normalizeEmail(email);
 
             if (mode === 'login') {
-                await signIn({ email, password });
+                await signIn({ email: normalizedEmail, password });
                 navigate('/receitas', { replace: true });
                 return;
             }
 
             if (mode === 'register') {
                 await signUp({
-                    email,
+                    email: normalizedEmail,
                     password,
-                    fullName,
+                    fullName: normalizeSpaces(fullName),
                 });
                 setFeedbackMessage('Conta criada. Verifique seu email para confirmar o cadastro, se a confirmacao estiver ativa.');
                 return;
             }
 
-            await resetPassword(email);
+            await resetPassword(normalizedEmail);
             setFeedbackMessage('Email de recuperacao enviado.');
         } catch (error) {
             setLocalError(error.message || 'Nao foi possivel concluir a autenticacao.');
@@ -166,7 +194,12 @@ const Login = () => {
                                 variant="outlined"
                                 placeholder="Nome completo"
                                 value={fullName}
-                                onChange={(event) => setFullName(event.target.value)}
+                                onChange={(event) => {
+                                    setFullName(event.target.value.slice(0, VALIDATION_LIMITS.fullNameMax));
+                                    setFieldErrors((currentErrors) => ({ ...currentErrors, fullName: '' }));
+                                }}
+                                error={Boolean(fieldErrors.fullName)}
+                                helperText={fieldErrors.fullName}
                                 sx={inputStyles}
                                 slotProps={{
                                     input: {
@@ -177,6 +210,9 @@ const Login = () => {
                                             </InputAdornment>
                                         ),
                                     },
+                                    htmlInput: {
+                                        maxLength: VALIDATION_LIMITS.fullNameMax,
+                                    },
                                 }}
                             />
                         )}
@@ -186,7 +222,12 @@ const Login = () => {
                             variant="outlined"
                             placeholder="E-mail"
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={(event) => {
+                                setEmail(event.target.value.slice(0, VALIDATION_LIMITS.emailMax));
+                                setFieldErrors((currentErrors) => ({ ...currentErrors, email: '' }));
+                            }}
+                            error={Boolean(fieldErrors.email)}
+                            helperText={fieldErrors.email}
                             sx={inputStyles}
                             slotProps={{
                                 input: {
@@ -197,6 +238,9 @@ const Login = () => {
                                         </InputAdornment>
                                     ),
                                 },
+                                htmlInput: {
+                                    maxLength: VALIDATION_LIMITS.emailMax,
+                                },
                             }}
                         />
                         <TextField
@@ -205,8 +249,13 @@ const Login = () => {
                             variant="outlined"
                             placeholder="Senha"
                             value={password}
-                            onChange={(event) => setPassword(event.target.value)}
+                            onChange={(event) => {
+                                setPassword(event.target.value.slice(0, VALIDATION_LIMITS.passwordMax));
+                                setFieldErrors((currentErrors) => ({ ...currentErrors, password: '' }));
+                            }}
                             disabled={mode === 'reset'}
+                            error={Boolean(fieldErrors.password)}
+                            helperText={fieldErrors.password}
                             sx={inputStyles}
                             slotProps={{
                                 input: {
@@ -216,6 +265,9 @@ const Login = () => {
                                             <PersonSharp sx={{ fontSize: 20, color: '#98A2B3' }} />
                                         </InputAdornment>
                                     ),
+                                },
+                                htmlInput: {
+                                    maxLength: VALIDATION_LIMITS.passwordMax,
                                 },
                             }}
                         />

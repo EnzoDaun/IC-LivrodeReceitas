@@ -5,6 +5,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { primaryNavigationLinks } from '@/config/navigation';
 import { FONT_PRIMARY } from '@/config/constants/styles';
 import { useAuth } from '@/hooks/useAuth';
+import { VALIDATION_LIMITS, normalizeSpaces } from '@/utils/validation';
 
 
 
@@ -50,7 +51,9 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        if (onSearch && searchQuery.trim()) onSearch(searchQuery);
+        const normalizedSearchQuery = normalizeSpaces(searchQuery).slice(0, VALIDATION_LIMITS.searchMax);
+
+        if (onSearch && normalizedSearchQuery) onSearch(normalizedSearchQuery);
     };
 
     return (
@@ -143,8 +146,8 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                         <InputBase
                             placeholder="Pesquisar receitas..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            inputProps={{ 'aria-label': 'Pesquisar receitas' }}
+                            onChange={(e) => setSearchQuery(e.target.value.slice(0, VALIDATION_LIMITS.searchMax))}
+                            inputProps={{ 'aria-label': 'Pesquisar receitas', maxLength: VALIDATION_LIMITS.searchMax }}
                             sx={{
                                 flex: 1, fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 400, fontStyle: 'italic', color: '#F06A57',
                                 '& input': {

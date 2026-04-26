@@ -24,6 +24,48 @@ exception
   when duplicate_object then null;
 end $$;
 
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'profiles_email_length_check'
+       and conrelid = 'public.profiles'::regclass
+  ) then
+    alter table public.profiles
+      add constraint profiles_email_length_check
+      check (email is null or char_length(email) <= 254);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'profiles_email_format_check'
+       and conrelid = 'public.profiles'::regclass
+  ) then
+    alter table public.profiles
+      add constraint profiles_email_format_check
+      check (email is null or email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]{2,}$');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'profiles_full_name_length_check'
+       and conrelid = 'public.profiles'::regclass
+  ) then
+    alter table public.profiles
+      add constraint profiles_full_name_length_check
+      check (full_name is null or btrim(full_name) = '' or char_length(btrim(full_name)) between 2 and 80);
+  end if;
+end $$;
+
 create table if not exists public.recipe_categories (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -44,15 +86,29 @@ begin
   end if;
 end $$;
 
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipe_categories_name_length_check'
+       and conrelid = 'public.recipe_categories'::regclass
+  ) then
+    alter table public.recipe_categories
+      add constraint recipe_categories_name_length_check
+      check (char_length(btrim(name)) between 2 and 60);
+  end if;
+end $$;
+
 create table if not exists public.recipes (
   id uuid primary key default gen_random_uuid(),
   author_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   description text not null default '',
-  category text,
+  category text not null,
   difficulty text not null default 'Fácil',
-  prep_time_minutes integer not null default 0,
-  portions integer not null default 0,
+  prep_time_minutes integer not null default 1,
+  portions integer not null default 1,
   average_rating numeric(2, 1) not null default 0,
   is_published boolean not null default true,
   created_at timestamptz not null default timezone('utc', now()),
@@ -190,10 +246,14 @@ values
   ('Bebidas')
 on conflict (name) do nothing;
 
+update public.recipe_categories
+   set name = btrim(regexp_replace(name, '\s+', ' ', 'g'));
+
 update public.recipes
-   set category = btrim(category)
- where category is not null
-   and category <> btrim(category);
+   set title = btrim(regexp_replace(title, '\s+', ' ', 'g')),
+       description = btrim(regexp_replace(description, '\s+', ' ', 'g')),
+       category = btrim(regexp_replace(category, '\s+', ' ', 'g'))
+ where category is not null;
 
 insert into public.recipe_categories (name)
 select distinct category
@@ -217,6 +277,15 @@ alter table public.recipes
 alter table public.recipes
   alter column difficulty set not null;
 
+alter table public.recipes
+  alter column category set not null;
+
+alter table public.recipes
+  alter column prep_time_minutes set default 1;
+
+alter table public.recipes
+  alter column portions set default 1;
+
 do $$
 begin
   if not exists (
@@ -236,6 +305,62 @@ begin
   if not exists (
     select 1
       from pg_constraint
+     where conname = 'recipes_title_length_check'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_title_length_check
+      check (char_length(btrim(title)) between 3 and 100);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipes_description_length_check'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_description_length_check
+      check (char_length(btrim(description)) between 10 and 800);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipes_prep_time_minutes_range_check'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_prep_time_minutes_range_check
+      check (prep_time_minutes between 1 and 1440);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipes_portions_range_check'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_portions_range_check
+      check (portions between 1 and 100);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
      where conname = 'recipes_category_fkey'
        and conrelid = 'public.recipes'::regclass
   ) then
@@ -244,6 +369,40 @@ begin
       foreign key (category)
       references public.recipe_categories(name)
       on update cascade;
+  end if;
+end $$;
+
+update public.recipe_ingredients
+   set content = btrim(regexp_replace(content, '\s+', ' ', 'g'));
+
+update public.recipe_steps
+   set content = btrim(regexp_replace(content, '\s+', ' ', 'g'));
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipe_ingredients_content_length_check'
+       and conrelid = 'public.recipe_ingredients'::regclass
+  ) then
+    alter table public.recipe_ingredients
+      add constraint recipe_ingredients_content_length_check
+      check (char_length(btrim(content)) between 2 and 180);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipe_steps_content_length_check'
+       and conrelid = 'public.recipe_steps'::regclass
+  ) then
+    alter table public.recipe_steps
+      add constraint recipe_steps_content_length_check
+      check (char_length(btrim(content)) between 5 and 500);
   end if;
 end $$;
 

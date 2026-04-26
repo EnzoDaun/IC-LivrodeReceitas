@@ -26,6 +26,11 @@ import {
     deleteRecipeCategory,
     updateRecipeCategory,
 } from '@/services/supabase/recipeService';
+import {
+    VALIDATION_LIMITS,
+    normalizeSpaces,
+    validateCategoryName,
+} from '@/utils/validation';
 
 const dialogInputSx = {
     '& .MuiOutlinedInput-root': {
@@ -44,10 +49,6 @@ const dialogInputSx = {
     },
 };
 
-function normalizeCategoryName(name) {
-    return name.trim().replace(/\s+/g, ' ');
-}
-
 function sortCategories(categories) {
     return [...categories].sort((firstCategory, secondCategory) => (
         firstCategory.name.localeCompare(secondCategory.name, 'pt-BR')
@@ -65,11 +66,11 @@ function mergeCategory(categories, category) {
 }
 
 function hasCategoryName(categories, name, ignoredCategoryId = null) {
-    const normalizedName = name.toLocaleLowerCase('pt-BR');
+    const normalizedName = normalizeSpaces(name).toLocaleLowerCase('pt-BR');
 
     return categories.some((category) => (
         category.id !== ignoredCategoryId
-        && category.name.toLocaleLowerCase('pt-BR') === normalizedName
+        && normalizeSpaces(category.name).toLocaleLowerCase('pt-BR') === normalizedName
     ));
 }
 
@@ -88,6 +89,8 @@ const CategoryManagerDialog = ({
     const [busyAction, setBusyAction] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [newCategoryError, setNewCategoryError] = useState('');
+    const [editingCategoryError, setEditingCategoryError] = useState('');
 
     useEffect(() => {
         if (!open) {
@@ -96,6 +99,8 @@ const CategoryManagerDialog = ({
             setEditingCategoryName('');
             setDeleteCandidate(null);
             setBusyAction('');
+            setNewCategoryError('');
+            setEditingCategoryError('');
         }
 
         setErrorMessage('');
@@ -103,17 +108,22 @@ const CategoryManagerDialog = ({
     }, [open]);
 
     const handleCreateCategory = async () => {
-        const categoryName = normalizeCategoryName(newCategoryName);
+        const categoryName = normalizeSpaces(newCategoryName);
+        const categoryError = validateCategoryName(categoryName);
         setErrorMessage('');
         setSuccessMessage('');
+        setNewCategoryError('');
 
-        if (!categoryName) {
-            setErrorMessage('Informe o nome da categoria.');
+        if (categoryError) {
+            setNewCategoryError(categoryError);
+            setErrorMessage(categoryError);
             return;
         }
 
         if (hasCategoryName(categories, categoryName)) {
-            setErrorMessage('Essa categoria ja existe.');
+            const duplicateMessage = 'Essa categoria ja existe.';
+            setNewCategoryError(duplicateMessage);
+            setErrorMessage(duplicateMessage);
             return;
         }
 
@@ -137,26 +147,33 @@ const CategoryManagerDialog = ({
         setDeleteCandidate(null);
         setErrorMessage('');
         setSuccessMessage('');
+        setEditingCategoryError('');
     };
 
     const handleSaveEdit = async (category) => {
-        const categoryName = normalizeCategoryName(editingCategoryName);
+        const categoryName = normalizeSpaces(editingCategoryName);
+        const categoryError = validateCategoryName(categoryName);
         setErrorMessage('');
         setSuccessMessage('');
+        setEditingCategoryError('');
 
-        if (!categoryName) {
-            setErrorMessage('Informe o nome da categoria.');
+        if (categoryError) {
+            setEditingCategoryError(categoryError);
+            setErrorMessage(categoryError);
             return;
         }
 
         if (hasCategoryName(categories, categoryName, category.id)) {
-            setErrorMessage('Essa categoria ja existe.');
+            const duplicateMessage = 'Essa categoria ja existe.';
+            setEditingCategoryError(duplicateMessage);
+            setErrorMessage(duplicateMessage);
             return;
         }
 
         if (categoryName === category.name) {
             setEditingCategoryId(null);
             setEditingCategoryName('');
+            setEditingCategoryError('');
             return;
         }
 
@@ -174,6 +191,7 @@ const CategoryManagerDialog = ({
 
             setEditingCategoryId(null);
             setEditingCategoryName('');
+            setEditingCategoryError('');
             setSuccessMessage('Categoria atualizada.');
         } catch (error) {
             setErrorMessage(error.message || 'Nao foi possivel atualizar a categoria.');
@@ -202,6 +220,7 @@ const CategoryManagerDialog = ({
             setDeleteCandidate(null);
             setEditingCategoryId(null);
             setEditingCategoryName('');
+            setEditingCategoryError('');
             setSuccessMessage('Categoria excluida.');
         } catch (error) {
             setErrorMessage(error.message || 'Nao foi possivel excluir a categoria.');
@@ -232,7 +251,10 @@ const CategoryManagerDialog = ({
                                 fullWidth
                                 size="small"
                                 value={newCategoryName}
-                                onChange={(event) => setNewCategoryName(event.target.value)}
+                                onChange={(event) => {
+                                    setNewCategoryName(event.target.value.slice(0, VALIDATION_LIMITS.categoryNameMax));
+                                    setNewCategoryError('');
+                                }}
                                 onKeyDown={(event) => {
                                     if (event.key === 'Enter') {
                                         event.preventDefault();
@@ -240,6 +262,13 @@ const CategoryManagerDialog = ({
                                     }
                                 }}
                                 placeholder="Nome da categoria"
+                                error={Boolean(newCategoryError)}
+                                helperText={newCategoryError || `${newCategoryName.length}/${VALIDATION_LIMITS.categoryNameMax}`}
+                                slotProps={{
+                                    htmlInput: {
+                                        maxLength: VALIDATION_LIMITS.categoryNameMax,
+                                    },
+                                }}
                                 sx={dialogInputSx}
                             />
                             <Button
@@ -299,12 +328,22 @@ const CategoryManagerDialog = ({
                                                     fullWidth
                                                     size="small"
                                                     value={editingCategoryName}
-                                                    onChange={(event) => setEditingCategoryName(event.target.value)}
+                                                    onChange={(event) => {
+                                                        setEditingCategoryName(event.target.value.slice(0, VALIDATION_LIMITS.categoryNameMax));
+                                                        setEditingCategoryError('');
+                                                    }}
                                                     onKeyDown={(event) => {
                                                         if (event.key === 'Enter') {
                                                             event.preventDefault();
                                                             handleSaveEdit(category);
                                                         }
+                                                    }}
+                                                    error={Boolean(editingCategoryError)}
+                                                    helperText={editingCategoryError || `${editingCategoryName.length}/${VALIDATION_LIMITS.categoryNameMax}`}
+                                                    slotProps={{
+                                                        htmlInput: {
+                                                            maxLength: VALIDATION_LIMITS.categoryNameMax,
+                                                        },
                                                     }}
                                                     sx={dialogInputSx}
                                                 />
@@ -341,6 +380,7 @@ const CategoryManagerDialog = ({
                                                             onClick={() => {
                                                                 setEditingCategoryId(null);
                                                                 setEditingCategoryName('');
+                                                                setEditingCategoryError('');
                                                             }}
                                                             size="small"
                                                         >

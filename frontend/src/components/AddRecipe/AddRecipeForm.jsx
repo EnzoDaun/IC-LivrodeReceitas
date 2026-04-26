@@ -8,6 +8,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CategoryIcon from '@mui/icons-material/Category';
 import { useNavigate } from 'react-router-dom';
 import { FONT_PRIMARY, COLOR_ORANGE } from '@/config/constants/styles';
@@ -18,6 +19,14 @@ import {
     updateRecipe,
 } from '@/services/supabase/recipeService';
 import CategoryManagerDialog from '@/components/AddRecipe/CategoryManagerDialog';
+import {
+    VALIDATION_LIMITS,
+    getFirstValidationMessage,
+    normalizeSpaces,
+    validateImageFiles,
+    validateIntegerRange,
+    validateRequiredText,
+} from '@/utils/validation';
 
 const cardSx = {
     width: '100%',
@@ -102,6 +111,9 @@ function FormField({
     onChange,
     type = 'text',
     placeholder = '',
+    error = false,
+    helperText = '',
+    inputProps,
 }) {
     return (
         <Box>
@@ -115,6 +127,11 @@ function FormField({
                 onChange={onChange}
                 type={type}
                 placeholder={placeholder}
+                error={error}
+                helperText={helperText}
+                slotProps={{
+                    htmlInput: inputProps,
+                }}
                 sx={{
                     ...inputSx,
                     '& .MuiOutlinedInput-input': {
@@ -138,6 +155,8 @@ function SelectField({
     options,
     placeholder,
     disabled = false,
+    error = false,
+    helperText = '',
 }) {
     return (
         <Box>
@@ -149,6 +168,8 @@ function SelectField({
                 value={value}
                 onChange={onChange}
                 disabled={disabled}
+                error={error}
+                helperText={helperText}
                 SelectProps={{ displayEmpty: true }}
                 sx={{
                     ...inputSx,
@@ -179,7 +200,7 @@ function SelectField({
     );
 }
 
-function DynamicListSection({ title, addLabel, items, onChange, placeholder }) {
+function DynamicListSection({ title, addLabel, items, onChange, placeholder, errors = [], maxLength }) {
     return (
         <Paper elevation={0} sx={cardSx}>
             <SectionTitle>{title}</SectionTitle>
@@ -197,8 +218,17 @@ function DynamicListSection({ title, addLabel, items, onChange, placeholder }) {
                         value={item}
                         onChange={(event) => {
                             const nextItems = [...items];
-                            nextItems[index] = event.target.value;
+                            nextItems[index] = maxLength
+                                ? event.target.value.slice(0, maxLength)
+                                : event.target.value;
                             onChange(nextItems);
+                        }}
+                        error={Boolean(errors[index])}
+                        helperText={errors[index]}
+                        slotProps={{
+                            htmlInput: {
+                                maxLength,
+                            },
                         }}
                         sx={{
                             ...inputSx,
@@ -233,6 +263,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [formErrors, setFormErrors] = useState({});
     const [categories, setCategories] = useState([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(false);
     const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
@@ -287,14 +318,36 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
     }, [initialRecipe, isEditMode]);
 
     const handleFieldChange = (field) => (event) => {
+        const numericFields = ['prepTimeMinutes', 'portions'];
+        const nextValue = numericFields.includes(field)
+            ? event.target.value.replace(/\D/g, '')
+            : event.target.value;
+
         setFormValues((currentValues) => ({
             ...currentValues,
-            [field]: event.target.value,
+            [field]: nextValue,
+        }));
+        setFormErrors((currentErrors) => ({
+            ...currentErrors,
+            [field]: '',
         }));
     };
 
     const handleSelectFiles = (event) => {
-        setFiles(Array.from(event.target.files || []).slice(0, 5));
+        const selectedFiles = Array.from(event.target.files || []);
+        const fileError = validateImageFiles(selectedFiles);
+
+        if (fileError) {
+            setFiles([]);
+            setFormErrors((currentErrors) => ({ ...currentErrors, files: fileError }));
+            setErrorMessage(fileError);
+            event.target.value = '';
+            return;
+        }
+
+        setFiles(selectedFiles);
+        setFormErrors((currentErrors) => ({ ...currentErrors, files: '' }));
+        setErrorMessage('');
     };
 
     const handleCategoriesChange = (nextCategories) => {
@@ -306,6 +359,68 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             ...currentValues,
             category: categoryName,
         }));
+        setFormErrors((currentErrors) => ({ ...currentErrors, category: '' }));
+    };
+
+    const handleIngredientsChange = (nextIngredients) => {
+        setIngredients(nextIngredients);
+        setFormErrors((currentErrors) => ({ ...currentErrors, ingredients: [] }));
+    };
+
+    const handleInstructionsChange = (nextInstructions) => {
+        setInstructions(nextInstructions);
+        setFormErrors((currentErrors) => ({ ...currentErrors, instructions: [] }));
+    };
+
+    const handleGoBack = () => {
+        navigate('/receitas');
+    };
+
+    const validateRecipeForm = () => {
+        const ingredientErrors = ingredients.map((ingredient, index) => (
+            validateRequiredText(ingredient, {
+                label: `o ingrediente ${index + 1}`,
+                min: VALIDATION_LIMITS.ingredientMin,
+                max: VALIDATION_LIMITS.ingredientMax,
+            })
+        ));
+        const instructionErrors = instructions.map((instruction, index) => (
+            validateRequiredText(instruction, {
+                label: `a instrucao ${index + 1}`,
+                min: VALIDATION_LIMITS.stepMin,
+                max: VALIDATION_LIMITS.stepMax,
+            })
+        ));
+        const selectedCategory = formValues.category.trim();
+        const selectedDifficulty = formValues.difficulty.trim();
+
+        return {
+            title: validateRequiredText(formValues.title, {
+                label: 'o titulo da receita',
+                min: VALIDATION_LIMITS.recipeTitleMin,
+                max: VALIDATION_LIMITS.recipeTitleMax,
+            }),
+            description: validateRequiredText(formValues.description, {
+                label: 'a descricao da receita',
+                min: VALIDATION_LIMITS.recipeDescriptionMin,
+                max: VALIDATION_LIMITS.recipeDescriptionMax,
+            }),
+            category: categoryOptions.includes(selectedCategory) ? '' : 'Selecione uma categoria cadastrada.',
+            difficulty: difficultyOptions.includes(selectedDifficulty) ? '' : 'Selecione uma dificuldade: Fácil, Médio ou Difícil.',
+            prepTimeMinutes: validateIntegerRange(formValues.prepTimeMinutes, {
+                label: 'o tempo de preparo',
+                min: VALIDATION_LIMITS.prepTimeMin,
+                max: VALIDATION_LIMITS.prepTimeMax,
+            }),
+            portions: validateIntegerRange(formValues.portions, {
+                label: 'as porcoes',
+                min: VALIDATION_LIMITS.portionsMin,
+                max: VALIDATION_LIMITS.portionsMax,
+            }),
+            files: validateImageFiles(files),
+            ingredients: ingredientErrors,
+            instructions: instructionErrors,
+        };
     };
 
     const handleSubmit = async () => {
@@ -315,34 +430,27 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
         try {
             setIsSubmitting(true);
 
-            if (!formValues.title.trim()) {
-                throw new Error('Informe o titulo da receita.');
-            }
+            const nextFormErrors = validateRecipeForm();
+            const validationMessage = getFirstValidationMessage({
+                ...nextFormErrors,
+                ingredients: nextFormErrors.ingredients.find(Boolean) || '',
+                instructions: nextFormErrors.instructions.find(Boolean) || '',
+            });
 
-            if (!formValues.description.trim()) {
-                throw new Error('Informe a descricao da receita.');
-            }
-
-            const selectedCategory = formValues.category.trim();
-            const selectedDifficulty = formValues.difficulty.trim();
-
-            if (!categoryOptions.includes(selectedCategory)) {
-                throw new Error('Selecione uma categoria cadastrada.');
-            }
-
-            if (!difficultyOptions.includes(selectedDifficulty)) {
-                throw new Error('Selecione uma dificuldade: Fácil, Médio ou Difícil.');
+            if (validationMessage) {
+                setFormErrors(nextFormErrors);
+                throw new Error(validationMessage);
             }
 
             const payload = {
-                title: formValues.title.trim(),
-                description: formValues.description.trim(),
-                category: selectedCategory,
-                difficulty: selectedDifficulty,
+                title: normalizeSpaces(formValues.title),
+                description: normalizeSpaces(formValues.description),
+                category: formValues.category.trim(),
+                difficulty: formValues.difficulty.trim(),
                 prepTimeMinutes: Number(formValues.prepTimeMinutes || 0),
                 portions: Number(formValues.portions || 0),
-                ingredients,
-                instructions,
+                ingredients: ingredients.map(normalizeSpaces),
+                instructions: instructions.map(normalizeSpaces),
                 files,
             };
 
@@ -392,8 +500,25 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             <Paper elevation={0} sx={{ ...cardSx, mb: '12px' }}>
                 <SectionTitle>Informacoes basicas</SectionTitle>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <FormField label="Titulo da receita" height={26} value={formValues.title} onChange={handleFieldChange('title')} />
-                    <FormField label="Descricao" multiline rows={2} value={formValues.description} onChange={handleFieldChange('description')} />
+                    <FormField
+                        label="Titulo da receita"
+                        height={26}
+                        value={formValues.title}
+                        onChange={handleFieldChange('title')}
+                        error={Boolean(formErrors.title)}
+                        helperText={formErrors.title}
+                        inputProps={{ maxLength: VALIDATION_LIMITS.recipeTitleMax }}
+                    />
+                    <FormField
+                        label="Descricao"
+                        multiline
+                        rows={2}
+                        value={formValues.description}
+                        onChange={handleFieldChange('description')}
+                        error={Boolean(formErrors.description)}
+                        helperText={formErrors.description}
+                        inputProps={{ maxLength: VALIDATION_LIMITS.recipeDescriptionMax }}
+                    />
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '16px' }}>
                         <Box sx={{ flex: 1 }}>
                             <SelectField
@@ -404,6 +529,8 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                                 options={categoryOptions}
                                 placeholder={isLoadingCategories ? 'Carregando categorias...' : 'Selecione uma categoria'}
                                 disabled={isLoadingCategories}
+                                error={Boolean(formErrors.category)}
+                                helperText={formErrors.category}
                             />
                             <Button
                                 onClick={() => setIsCategoryManagerOpen(true)}
@@ -430,15 +557,33 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                                 onChange={handleFieldChange('difficulty')}
                                 options={difficultyOptions}
                                 placeholder="Selecione a dificuldade"
+                                error={Boolean(formErrors.difficulty)}
+                                helperText={formErrors.difficulty}
                             />
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: '16px' }}>
                         <Box sx={{ flex: 1 }}>
-                            <FormField label="Tempo de preparo (min)" height={26} value={formValues.prepTimeMinutes} onChange={handleFieldChange('prepTimeMinutes')} type="number" />
+                            <FormField
+                                label="Tempo de preparo (min)"
+                                height={26}
+                                value={formValues.prepTimeMinutes}
+                                onChange={handleFieldChange('prepTimeMinutes')}
+                                error={Boolean(formErrors.prepTimeMinutes)}
+                                helperText={formErrors.prepTimeMinutes}
+                                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 4 }}
+                            />
                         </Box>
                         <Box sx={{ flex: 1 }}>
-                            <FormField label="Porcoes" height={26} value={formValues.portions} onChange={handleFieldChange('portions')} type="number" />
+                            <FormField
+                                label="Porcoes"
+                                height={26}
+                                value={formValues.portions}
+                                onChange={handleFieldChange('portions')}
+                                error={Boolean(formErrors.portions)}
+                                helperText={formErrors.portions}
+                                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 3 }}
+                            />
                         </Box>
                     </Box>
                 </Box>
@@ -482,8 +627,13 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                         PNG ou JPG ate 10MB
                     </Typography>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', fontWeight: 400, color: '#9A9A9A', mt: '3px' }}>
-                        {`${files.length} de 5 imagens selecionadas`}
+                        {`${files.length} de ${VALIDATION_LIMITS.imageMaxFiles} imagens selecionadas`}
                     </Typography>
+                    {formErrors.files && (
+                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', fontWeight: 700, color: '#B42318', mt: '3px' }}>
+                            {formErrors.files}
+                        </Typography>
+                    )}
                     {isEditMode && (
                         <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', fontWeight: 400, color: '#9A9A9A', mt: '3px' }}>
                             {files.length > 0
@@ -499,8 +649,10 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                     title="Ingredientes"
                     addLabel="+ Adicionar ingrediente"
                     items={ingredients}
-                    onChange={setIngredients}
+                    onChange={handleIngredientsChange}
                     placeholder="Descreva cada ingrediente"
+                    errors={formErrors.ingredients}
+                    maxLength={VALIDATION_LIMITS.ingredientMax}
                 />
             </Box>
 
@@ -508,29 +660,55 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                 title="Instrucoes"
                 addLabel="+ Adicionar instrucao"
                 items={instructions}
-                onChange={setInstructions}
+                onChange={handleInstructionsChange}
                 placeholder="Descreva o passo"
+                errors={formErrors.instructions}
+                maxLength={VALIDATION_LIMITS.stepMax}
             />
 
-            <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                sx={{
-                    mt: '18px',
-                    width: '100%',
-                    height: '46px',
-                    backgroundColor: COLOR_ORANGE,
-                    color: '#FFFFFF',
-                    borderRadius: '8px',
-                    fontFamily: FONT_PRIMARY,
-                    fontWeight: 700,
-                    '&:hover': {
-                        backgroundColor: '#D98E04',
-                    },
-                }}
-            >
-                {isSubmitting ? 'Salvando...' : (isEditMode ? 'Atualizar receita' : 'Salvar receita')}
-            </Button>
+            <Box sx={{ mt: '18px', display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: '12px' }}>
+                {isEditMode && (
+                    <Button
+                        onClick={handleGoBack}
+                        disabled={isSubmitting}
+                        startIcon={<ArrowBackIcon fontSize="small" />}
+                        sx={{
+                            flex: { xs: '1 1 auto', sm: '0 0 180px' },
+                            height: '46px',
+                            color: '#333333',
+                            border: '1px solid #8FA0B7',
+                            borderRadius: '8px',
+                            fontFamily: FONT_PRIMARY,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            '&:hover': {
+                                borderColor: '#667085',
+                                backgroundColor: '#F7F7F7',
+                            },
+                        }}
+                    >
+                        Voltar
+                    </Button>
+                )}
+                <Button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    sx={{
+                        flex: 1,
+                        height: '46px',
+                        backgroundColor: COLOR_ORANGE,
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        fontFamily: FONT_PRIMARY,
+                        fontWeight: 700,
+                        '&:hover': {
+                            backgroundColor: '#D98E04',
+                        },
+                    }}
+                >
+                    {isSubmitting ? 'Salvando...' : (isEditMode ? 'Atualizar receita' : 'Salvar receita')}
+                </Button>
+            </Box>
 
             <CategoryManagerDialog
                 open={isCategoryManagerOpen}
