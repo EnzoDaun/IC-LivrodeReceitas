@@ -1,14 +1,19 @@
 import { FONT_SANS } from '@/config/constants/styles';
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
-    Facebook as FacebookIcon,
     Instagram as InstagramIcon,
     YouTube as YouTubeIcon,
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { socialLinks } from '@/config/socialLinks';
+
+const socialIconByName = {
+    instagram: InstagramIcon,
+    youtube: YouTubeIcon,
+};
 
 const footerLinks = [
     { label: 'RECEITAS', to: '/receitas' },
@@ -17,19 +22,6 @@ const footerLinks = [
     { label: 'SOBRE NOS', to: '/sobre' },
     { label: 'LOGIN', to: '/login' },
 ];
-
-const socialLinks = [
-    { label: 'TikTok', href: '#', icon: 'tiktok' },
-    { label: 'Facebook', href: '#', icon: FacebookIcon },
-    { label: 'Instagram', href: '#', icon: InstagramIcon },
-    { label: 'YouTube', href: '#', icon: YouTubeIcon },
-];
-
-const TikTokIcon = (props) => (
-    <SvgIcon viewBox="0 0 24 24" {...props}>
-        <path d="M16.6 5.82c1.18 1.3 2.66 2.04 4.4 2.18v3.47c-1.62-.04-3.1-.43-4.4-1.18v5.36c0 3.44-2.26 5.85-5.57 5.85-3.01 0-5.03-1.86-5.03-4.64 0-2.93 2.19-5.01 5.28-5.01.32 0 .62.03.91.09v3.61a2.8 2.8 0 0 0-1.08-.21c-1.02 0-1.71.61-1.71 1.51 0 .82.61 1.38 1.51 1.38 1.07 0 1.72-.72 1.72-1.9V2.5h3.97v3.32Z" />
-    </SvgIcon>
-);
 
 const linkSx = {
     fontFamily: FONT_SANS,
@@ -179,12 +171,14 @@ const Footer = () => {
                         }}
                     >
                         {socialLinks.map(({ label, href, icon }) => {
-                            const SocialIcon = icon === 'tiktok' ? TikTokIcon : icon;
+                            const SocialIcon = socialIconByName[icon];
                             return (
                                 <IconButton
                                     key={label}
                                     component="a"
                                     href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
                                     aria-label={label}
                                     sx={{
                                         width: 28, height: 28, color: 'background.default', p: 0,

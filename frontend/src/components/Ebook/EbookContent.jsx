@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
-    Facebook as FacebookIcon,
     Instagram as InstagramIcon,
     MailOutline as MailOutlineIcon,
-    MusicNote as MusicNoteIcon,
     YouTube as YouTubeIcon,
 } from '@mui/icons-material';
 import Chapter from '@/components/Ebook/Chapter';
 import DialogReceberEbook from '@/components/Ebook/DialogReceberEbook';
 import EbookValues from '@/components/Ebook/EbookValues';
 import { FONT_SANS } from '@/config/constants/styles';
+import { socialLinks } from '@/config/socialLinks';
+
+const socialIconByName = {
+    instagram: InstagramIcon,
+    youtube: YouTubeIcon,
+};
 
 // ─── Dados ────────────────────────────────────────────────────────────────────
 
@@ -22,13 +26,6 @@ const ebookSections = [
     { id: 'ebook-section-4', label: 'Bloco 4', background: (theme) => alpha(theme.palette.background.default, 1) },
     { id: 'ebook-section-5', label: 'Bloco 5', background: 'linear-gradient(135deg, #102313 0%, #1F3D21 48%, #0B1D11 100%)' },
     { id: 'ebook-section-6', label: 'Bloco 6', background: (theme) => alpha(theme.palette.background.paper, 1) },
-];
-
-const authorSocialLinks = [
-    { label: 'TikTok', href: '#', icon: MusicNoteIcon },
-    { label: 'Facebook', href: '#', icon: FacebookIcon },
-    { label: 'Instagram', href: '#', icon: InstagramIcon },
-    { label: 'YouTube', href: '#', icon: YouTubeIcon },
 ];
 
 const chapterContentSx = {
@@ -80,12 +77,31 @@ const EbookContent = () => {
                                             <Typography variant="body2" sx={{ fontFamily: FONT_SANS, color: 'text.primary', fontWeight: 600, fontSize: { xs: '13px', md: '14px' }, lineHeight: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                                                 Siga-me
                                             </Typography>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: { xs: 0.5, sm: 0.75 } }}>
-                                                {authorSocialLinks.map(({ label, href, icon: SocialIcon }) => (
-                                                    <IconButton key={label} component="a" href={href} aria-label={label} sx={{ width: 30, height: 30, color: 'text.primary', p: 0, '&:hover': { color: 'sustainable.dark', backgroundColor: alpha('#2D4B27', 0.08) } }}>
-                                                        <SocialIcon sx={{ fontSize: 20 }} />
-                                                    </IconButton>
-                                                ))}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: { xs: 1, sm: 1.5 }, flexWrap: 'wrap' }}>
+                                                {socialLinks.map(({ label, href, icon }) => {
+                                                    const SocialIcon = socialIconByName[icon];
+                                                    return (
+                                                        <Box
+                                                            key={label}
+                                                            component="a"
+                                                            href={href}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            aria-label={label}
+                                                            sx={{
+                                                                width: 30,
+                                                                height: 30,
+                                                                color: 'text.primary',
+                                                                display: 'grid',
+                                                                placeItems: 'center',
+                                                                textDecoration: 'none',
+                                                                '&:hover': { color: 'sustainable.dark', backgroundColor: alpha('#2D4B27', 0.08) },
+                                                            }}
+                                                        >
+                                                            <SocialIcon sx={{ fontSize: 20 }} />
+                                                        </Box>
+                                                    );
+                                                })}
                                             </Box>
                                         </Box>
                                     </Box>
