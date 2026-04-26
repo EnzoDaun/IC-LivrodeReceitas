@@ -50,17 +50,15 @@ const ChevronRight = () => (
 
 const FeaturedRecipes = ({
     recipes,
+    isLoading = false,
+    errorMessage = '',
     onViewRecipe,
+    onToggleFavorite,
     title = 'RECEITAS EM DESTAQUE',
     maxDisplay = 2,
 }) => {
     const canScrollLeft = false;
     const canScrollRight = true;
-
-    const handleToggleFavorite = (_recipeId, _isFavorite) => {
-        // TODO: persistir favorito
-    };
-
     const displayed = recipes ? recipes.slice(0, maxDisplay) : [];
 
     return (
@@ -70,7 +68,6 @@ const FeaturedRecipes = ({
             boxSizing: 'border-box',
             mt: '16px',
         }}>
-            {/* Container principal */}
             <Box sx={{
                 width: '100%',
                 border: '1px solid #C9C0B4',
@@ -80,14 +77,12 @@ const FeaturedRecipes = ({
                 p: '20px 16px 16px 16px',
                 position: 'relative',
             }}>
-                {/* Cabeçalho */}
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     mb: '18px',
                 }}>
-                    {/* Título com estrela */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                         <StarIcon />
                         <Typography sx={{
@@ -103,7 +98,6 @@ const FeaturedRecipes = ({
                         </Typography>
                     </Box>
 
-                    {/* Setas de navegação */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Box
                             sx={{
@@ -138,18 +132,32 @@ const FeaturedRecipes = ({
                     </Box>
                 </Box>
 
-                {/* Cards */}
                 <Box sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(2, 1fr)',
                     gap: '10px',
                 }}>
+                    {isLoading && (
+                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
+                            Carregando receitas...
+                        </Typography>
+                    )}
+                    {!isLoading && errorMessage && (
+                        <Typography sx={{ color: '#9F2D20', fontSize: '14px' }}>
+                            {errorMessage}
+                        </Typography>
+                    )}
+                    {!isLoading && !errorMessage && displayed.length === 0 && (
+                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
+                            Nenhuma receita publicada ainda.
+                        </Typography>
+                    )}
                     {displayed.map((recipe) => (
                         <RecipeCard
                             key={recipe.id}
                             recipe={recipe}
                             onView={onViewRecipe}
-                            onToggleFavorite={handleToggleFavorite}
+                            onToggleFavorite={onToggleFavorite}
                         />
                     ))}
                 </Box>

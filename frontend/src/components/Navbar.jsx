@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography, ButtonBase, InputBase } from '@mui/material';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { primaryNavigationLinks } from '@/config/navigation';
 import { FONT_PRIMARY } from '@/config/constants/styles';
+import { useAuth } from '@/hooks/useAuth';
 
 
 
@@ -27,12 +28,24 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
     const [searchQuery, setSearchQuery] = useState('');
     const [activeLink, setActiveLink] = useState(initialActiveLink);
     const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated, signOut } = useAuth();
 
     const navigationLinks = (links && links.length > 0) ? links : primaryNavigationLinks;
 
     const isLinkActive = (link) => {
+        if (link.isLogout) return false;
         if (link.to) return location.pathname === link.to;
         return activeLink === link.label;
+    };
+
+    const handleLogout = async () => {
+        try {
+            await signOut();
+            navigate('/login', { replace: true });
+        } catch (error) {
+            window.alert(error.message || 'Nao foi possivel sair da conta.');
+        }
     };
 
     const handleSearchSubmit = (e) => {
@@ -71,15 +84,29 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                 {/* ── NAVEGAÇÃO ── */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '30px', flexGrow: 1, justifyContent: 'center' }}>
                     {navigationLinks.map((link) => {
-                        const active = isLinkActive(link);
+                        const isLogout = isAuthenticated && link.label === 'Login';
+                        const displayedLink = isLogout
+                            ? { ...link, label: 'Sair', to: undefined, href: undefined, isLogout: true }
+                            : link;
+                        const active = isLinkActive(displayedLink);
+
                         return (
                             <ButtonBase
                                 key={link.label}
-                                component={link.to ? RouterLink : 'a'}
-                                to={link.to}
-                                href={link.href}
+                                component={displayedLink.to ? RouterLink : (displayedLink.href ? 'a' : 'button')}
+                                to={displayedLink.to}
+                                href={displayedLink.href}
+                                type={displayedLink.isLogout ? 'button' : undefined}
                                 disableRipple
-                                onClick={() => { if (!link.to) setActiveLink(link.label); }}
+                                onClick={(event) => {
+                                    if (displayedLink.isLogout) {
+                                        event.preventDefault();
+                                        handleLogout();
+                                        return;
+                                    }
+
+                                    if (!displayedLink.to) setActiveLink(displayedLink.label);
+                                }}
                                 sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textDecoration: 'none', p: 0 }}
                             >
                                 <Typography sx={{
@@ -92,7 +119,7 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                                     letterSpacing: '0.2px',
                                     whiteSpace: 'nowrap',
                                 }}>
-                                    {link.label}
+                                    {displayedLink.label}
                                 </Typography>
                                 {active && <Box sx={{ width: '100%', height: '2px', backgroundColor: '#F06A57', borderRadius: '1px' }} />}
                             </ButtonBase>

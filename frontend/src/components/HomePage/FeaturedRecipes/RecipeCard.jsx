@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { FONT_PRIMARY } from '@/config/constants/styles';
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
 const HeartIcon = ({ filled }) => (
@@ -19,11 +19,8 @@ const HeartIcon = ({ filled }) => (
 );
 
 const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
-    const [isFavorite, setIsFavorite] = useState(false);
-
     const handleFavoriteClick = () => {
-        const next = !isFavorite;
-        setIsFavorite(next);
+        const next = !recipe.isFavorite;
         if (onToggleFavorite) onToggleFavorite(recipe.id, next);
     };
 
@@ -40,7 +37,6 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
             display: 'flex',
             flexDirection: 'column',
         }}>
-            {/* Imagem */}
             <Box sx={{ width: '100%', height: '190px', flexShrink: 0, overflow: 'hidden' }}>
                 <Box
                     component="img"
@@ -56,10 +52,7 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                 />
             </Box>
 
-            {/* Conteúdo */}
             <Box sx={{ px: '14px', pt: '13px', pb: '12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-
-                {/* Título + coração */}
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: '8px' }}>
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
@@ -71,11 +64,10 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                         {recipe.title}
                     </Typography>
                     <Box onClick={handleFavoriteClick} sx={{ ml: '8px', mt: '1px' }}>
-                        <HeartIcon filled={isFavorite} />
+                        <HeartIcon filled={recipe.isFavorite} />
                     </Box>
                 </Box>
 
-                {/* Descrição */}
                 <Typography sx={{
                     fontFamily: FONT_PRIMARY,
                     fontSize: '12px',
@@ -87,14 +79,12 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                     {recipe.excerpt}
                 </Typography>
 
-                {/* Rodapé */}
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     mt: '12px',
                 }}>
-                    {/* Estrelas */}
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
                         fontSize: '17px',
@@ -106,7 +96,6 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                         ★★★★★
                     </Typography>
 
-                    {/* Meta */}
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
                         fontSize: '10px',
@@ -116,10 +105,9 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                         whiteSpace: 'nowrap',
                         textTransform: 'uppercase',
                     }}>
-                        {recipe.time} · {recipe.difficulty} · {recipe.portions}
+                        {`${recipe.time} · ${recipe.difficulty} · ${recipe.portions}`}
                     </Typography>
 
-                    {/* Botão */}
                     <Button
                         variant="outlined"
                         onClick={handleViewClick}
@@ -155,7 +143,6 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
     );
 };
 
-
 RecipeCard.propTypes = {
     recipe: PropTypes.shape({
         id: PropTypes.string.isRequired,
@@ -166,6 +153,7 @@ RecipeCard.propTypes = {
         time: PropTypes.string,
         difficulty: PropTypes.string,
         portions: PropTypes.string,
+        isFavorite: PropTypes.bool,
     }).isRequired,
     onView: PropTypes.func,
     onToggleFavorite: PropTypes.func,
