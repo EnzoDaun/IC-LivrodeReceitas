@@ -38,10 +38,11 @@ export function mapRecipeToCard(recipe) {
         category: recipe.category,
         imageUrl: resolveImageUrl(recipe),
         rating: Number(recipe.average_rating || 0),
-        ratingCount: Number(recipe.rating_count || 0),
+        prepTimeMinutes: Number(recipe.prep_time_minutes || 0),
         time: formatPrepTime(recipe.prep_time_minutes),
         difficulty: recipe.difficulty || 'SEM NIVEL',
         portions: formatPortions(recipe.portions),
+        createdAt: recipe.created_at,
         isFavorite: Boolean(recipe.is_favorite),
     };
 }

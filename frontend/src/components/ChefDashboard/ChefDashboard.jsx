@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     Alert,
     Box,
@@ -12,10 +12,23 @@ import {
     Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import RecipeFilterControls from '@/components/Recipes/RecipeFilterControls';
+import RecipePaginationControls from '@/components/Recipes/RecipePaginationControls';
+import {
+    ADMIN_STATUS_OPTIONS,
+    ALL_CATEGORIES,
+    ALL_DIFFICULTIES,
+    ALL_STATUSES,
+    DEFAULT_ADMIN_RECIPE_FILTERS,
+    DIFFICULTY_OPTIONS,
+    PAGE_SIZE_OPTIONS,
+    RECIPE_SORT_OPTIONS,
+} from '@/components/Recipes/recipeListControlOptions';
 import { FONT_PRIMARY, COLOR_ORANGE } from '@/config/constants/styles';
 import { useAuth } from '@/hooks/useAuth';
 import { mapDashboardStats } from '@/lib/supabase/recipeMappers';
-import { deleteRecipe, listManagedRecipes } from '@/services/supabase/recipeService';
+import { deleteRecipe, listManagedRecipes, listRecipeCategories } from '@/services/supabase/recipeService';
+import { normalizeSpaces } from '@/utils/validation';
 
 const defaultStats = [
     { label: 'Total de receitas', value: '0', description: 'Receitas publicadas' },
@@ -47,6 +60,14 @@ const secondaryBtn = {
     minWidth: 'unset',
 };
 
+function normalizeFilter(value) {
+    return normalizeSpaces(value).toLocaleLowerCase('pt-BR');
+}
+
+function getTimeValue(recipe) {
+    return Number(recipe.prep_time_minutes || 0) || Number.MAX_SAFE_INTEGER;
+}
+
 function StatCard({ label, value, description }) {
     return (
         <Paper elevation={0} sx={{
@@ -76,6 +97,10 @@ const ChefDashboard = () => {
     const { isAdmin, profile, user } = useAuth();
     const [stats, setStats] = useState(defaultStats);
     const [recipes, setRecipes] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [filters, setFilters] = useState(DEFAULT_ADMIN_RECIPE_FILTERS);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
     const [recipeToDelete, setRecipeToDelete] = useState(null);
@@ -115,13 +140,17 @@ const ChefDashboard = () => {
             try {
                 setIsLoading(true);
                 setErrorMessage('');
-                const nextRecipes = await listManagedRecipes({
-                    userId: user.id,
-                    isAdmin,
-                });
+                const [nextRecipes, recipeCategories] = await Promise.all([
+                    listManagedRecipes({
+                        userId: user.id,
+                        isAdmin,
+                    }),
+                    listRecipeCategories(),
+                ]);
 
                 if (!isMounted) return;
 
+                setCategories(recipeCategories);
                 setRecipes(nextRecipes);
                 setStats(mapDashboardStats(nextRecipes));
             } catch (error) {
@@ -143,6 +172,74 @@ const ChefDashboard = () => {
             isMounted = false;
         };
     }, [isAdmin, user?.id]);
+
+    const filteredRecipes = useMemo(() => {
+        const search = normalizeFilter(filters.search);
+
+        const nextRecipes = recipes.filter((recipe) => {
+            const matchesSearch = !search || [
+                recipe.title,
+                recipe.description,
+                recipe.category,
+                recipe.difficulty,
+            ].some((value) => normalizeFilter(value).includes(search));
+            const matchesCategory = filters.category === ALL_CATEGORIES || recipe.category === filters.category;
+            const matchesDifficulty = filters.difficulty === ALL_DIFFICULTIES || recipe.difficulty === filters.difficulty;
+            const matchesStatus = filters.status === ALL_STATUSES
+                || (filters.status === 'published' && recipe.is_published)
+                || (filters.status === 'draft' && !recipe.is_published);
+
+            return matchesSearch && matchesCategory && matchesDifficulty && matchesStatus;
+        });
+
+        return [...nextRecipes].sort((a, b) => {
+            if (filters.sort === 'rating') {
+                return Number(b.average_rating || 0) - Number(a.average_rating || 0)
+                    || a.title.localeCompare(b.title, 'pt-BR');
+            }
+
+            if (filters.sort === 'prepTime') {
+                return getTimeValue(a) - getTimeValue(b)
+                    || a.title.localeCompare(b.title, 'pt-BR');
+            }
+
+            if (filters.sort === 'title') {
+                return a.title.localeCompare(b.title, 'pt-BR');
+            }
+
+            return Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0);
+        });
+    }, [filters, recipes]);
+
+    const hasActiveFilters = filters.search
+        || filters.category !== ALL_CATEGORIES
+        || filters.difficulty !== ALL_DIFFICULTIES
+        || filters.status !== ALL_STATUSES
+        || filters.sort !== DEFAULT_ADMIN_RECIPE_FILTERS.sort;
+    const totalPages = Math.max(1, Math.ceil(filteredRecipes.length / pageSize));
+    const pageStartIndex = (currentPage - 1) * pageSize;
+    const paginatedRecipes = filteredRecipes.slice(pageStartIndex, pageStartIndex + pageSize);
+    const displayedStart = filteredRecipes.length === 0 ? 0 : pageStartIndex + 1;
+    const displayedEnd = Math.min(pageStartIndex + pageSize, filteredRecipes.length);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters, pageSize]);
+
+    useEffect(() => {
+        setCurrentPage((page) => Math.min(page, totalPages));
+    }, [totalPages]);
+
+    const updateFilter = (name, value) => {
+        setFilters((currentFilters) => ({
+            ...currentFilters,
+            [name]: value,
+        }));
+    };
+
+    const handleClearFilters = () => {
+        setFilters(DEFAULT_ADMIN_RECIPE_FILTERS);
+    };
 
     return (
         <>
@@ -192,6 +289,21 @@ const ChefDashboard = () => {
 
             {errorMessage && <Alert severity="error" sx={{ mt: 3 }}>{errorMessage}</Alert>}
 
+            {!isLoading && recipes.length > 0 && (
+                <RecipeFilterControls
+                    categories={categories}
+                    difficultyOptions={DIFFICULTY_OPTIONS}
+                    filters={filters}
+                    hasActiveFilters={Boolean(hasActiveFilters)}
+                    idPrefix="admin-recipes"
+                    onClear={handleClearFilters}
+                    onFilterChange={updateFilter}
+                    sortOptions={RECIPE_SORT_OPTIONS}
+                    statusOptions={ADMIN_STATUS_OPTIONS}
+                    variant="admin"
+                />
+            )}
+
             {isLoading && (
                 <Box sx={{ display: 'grid', placeItems: 'center', mt: '72px', mb: '60px' }}>
                     <CircularProgress sx={{ color: COLOR_ORANGE }} />
@@ -221,53 +333,75 @@ const ChefDashboard = () => {
             )}
 
             {!isLoading && recipes.length > 0 && (
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: '18px', mt: '28px', mb: '60px' }}>
-                    {recipes.map((recipe) => (
-                        <Paper key={recipe.id} elevation={0} sx={{ borderRadius: '12px', p: '18px', boxShadow: '0px 3px 13px rgba(0,0,0,0.08)' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                                <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '18px', fontWeight: 800, color: '#2A2A2A' }}>
-                                    {recipe.title}
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                                    <Button
-                                        disableElevation
-                                        onClick={() => goToEditRecipe(recipe.id)}
-                                        sx={{
-                                            ...secondaryBtn,
-                                            px: '10px',
-                                            height: '32px',
-                                            color: COLOR_ORANGE,
-                                            border: `1px solid ${COLOR_ORANGE}`,
-                                        }}
-                                    >
-                                        Editar
-                                    </Button>
-                                    <Button
-                                        disableElevation
-                                        onClick={() => setRecipeToDelete(recipe)}
-                                        sx={{
-                                            ...secondaryBtn,
-                                            px: '10px',
-                                            height: '32px',
-                                            color: '#B42318',
-                                            border: '1px solid #F0A8A0',
-                                            backgroundColor: '#FFF7F5',
-                                            '&:hover': { backgroundColor: '#FFEDEA' },
-                                        }}
-                                    >
-                                        Excluir
-                                    </Button>
-                                </Box>
-                            </Box>
-                            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#4A4A4A', mt: '8px' }}>
-                                {recipe.description || 'Sem descricao cadastrada.'}
-                            </Typography>
-                            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 700, color: COLOR_ORANGE, mt: '12px', textTransform: 'uppercase' }}>
-                                {`${recipe.category || 'Sem categoria'} · ${recipe.difficulty || 'Sem nivel'} · ${recipe.prep_time_minutes || 0} min`}
-                            </Typography>
-                        </Paper>
-                    ))}
-                </Box>
+                filteredRecipes.length === 0 ? (
+                    <Typography sx={{ fontFamily: FONT_PRIMARY, color: '#4A4A4A', my: '72px', textAlign: 'center' }}>
+                        Nenhuma receita encontrada com os filtros selecionados.
+                    </Typography>
+                ) : (
+                    <>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: '18px', mt: '28px' }}>
+                            {paginatedRecipes.map((recipe) => (
+                                <Paper key={recipe.id} elevation={0} sx={{ borderRadius: '12px', p: '18px', boxShadow: '0px 3px 13px rgba(0,0,0,0.08)' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '18px', fontWeight: 800, color: '#2A2A2A' }}>
+                                            {recipe.title}
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                                            <Button
+                                                disableElevation
+                                                onClick={() => goToEditRecipe(recipe.id)}
+                                                sx={{
+                                                    ...secondaryBtn,
+                                                    px: '10px',
+                                                    height: '32px',
+                                                    color: COLOR_ORANGE,
+                                                    border: `1px solid ${COLOR_ORANGE}`,
+                                                }}
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                disableElevation
+                                                onClick={() => setRecipeToDelete(recipe)}
+                                                sx={{
+                                                    ...secondaryBtn,
+                                                    px: '10px',
+                                                    height: '32px',
+                                                    color: '#B42318',
+                                                    border: '1px solid #F0A8A0',
+                                                    backgroundColor: '#FFF7F5',
+                                                    '&:hover': { backgroundColor: '#FFEDEA' },
+                                                }}
+                                            >
+                                                Excluir
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#4A4A4A', mt: '8px' }}>
+                                        {recipe.description || 'Sem descricao cadastrada.'}
+                                    </Typography>
+                                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 700, color: COLOR_ORANGE, mt: '12px', textTransform: 'uppercase' }}>
+                                        {`${recipe.category || 'Sem categoria'} · ${recipe.difficulty || 'Sem nivel'} · ${recipe.prep_time_minutes || 0} min`}
+                                    </Typography>
+                                </Paper>
+                            ))}
+                        </Box>
+
+                        <RecipePaginationControls
+                            bottomSpacing="60px"
+                            displayedEnd={displayedEnd}
+                            displayedStart={displayedStart}
+                            idPrefix="admin-recipes"
+                            onPageChange={setCurrentPage}
+                            onPageSizeChange={setPageSize}
+                            page={currentPage}
+                            pageSize={pageSize}
+                            pageSizeOptions={PAGE_SIZE_OPTIONS}
+                            totalItems={filteredRecipes.length}
+                            totalPages={totalPages}
+                        />
+                    </>
+                )
             )}
 
             <Dialog open={Boolean(recipeToDelete)} onClose={closeDeleteDialog} maxWidth="xs" fullWidth>
