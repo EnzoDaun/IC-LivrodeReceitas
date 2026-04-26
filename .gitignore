@@ -8,26 +8,15 @@
 # OS files
 .DS_Store
 Thumbs.db
-
-# Backend
-/descontao-backend/target/
-/descontao-backend/.mvn/
-/descontao-backend/mvnw
-/descontao-backend/mvnw.cmd
-
-# Frontend
-/descontao-frontend/node_modules/
-/descontao-frontend/dist/
-/descontao-frontend/.env.local
-/descontao-frontend/.env.development.local
-/descontao-frontend/.env.test.local
-/descontao-frontend/.env.production.local
+desktop.ini
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Runtime data
 pids
@@ -50,9 +39,21 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Build outputs
 build/
 dist/
+
+# Vite cache
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Test coverage
+coverage/
