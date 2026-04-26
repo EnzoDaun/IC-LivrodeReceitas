@@ -1,5 +1,5 @@
 import { FONT_PRIMARY } from '@/config/constants/styles';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import RecipeCard from '@/components/HomePage/FeaturedRecipes/RecipeCard';
 
@@ -18,13 +18,13 @@ const StarIcon = () => (
     </Box>
 );
 
-const ChevronLeft = () => (
+const ChevronLeft = ({ active }) => (
     <Box
         component="svg"
         viewBox="0 0 24 24"
         sx={{ width: 11, height: 11 }}
         fill="none"
-        stroke="#C9C0B4"
+        stroke={active ? '#111111' : '#C9C0B4'}
         strokeWidth="1.7"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -33,13 +33,13 @@ const ChevronLeft = () => (
     </Box>
 );
 
-const ChevronRight = () => (
+const ChevronRight = ({ active }) => (
     <Box
         component="svg"
         viewBox="0 0 24 24"
         sx={{ width: 11, height: 11 }}
         fill="none"
-        stroke="#111111"
+        stroke={active ? '#111111' : '#C9C0B4'}
         strokeWidth="1.7"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -48,6 +48,8 @@ const ChevronRight = () => (
     </Box>
 );
 
+const PAGE_SIZE = 2;
+
 const FeaturedRecipes = ({
     recipes,
     isLoading = false,
@@ -55,11 +57,28 @@ const FeaturedRecipes = ({
     onViewRecipe,
     onToggleFavorite,
     title = 'RECEITAS EM DESTAQUE',
-    maxDisplay = 2,
 }) => {
-    const canScrollLeft = false;
-    const canScrollRight = true;
-    const displayed = recipes ? recipes.slice(0, maxDisplay) : [];
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const canScrollLeft = currentIndex > 0;
+    const canScrollRight = currentIndex + PAGE_SIZE < (recipes?.length ?? 0);
+    const displayed = recipes ? recipes.slice(currentIndex, currentIndex + PAGE_SIZE) : [];
+
+    const handlePrev = () => {
+        if (canScrollLeft) setCurrentIndex((i) => i - PAGE_SIZE);
+    };
+
+    const handleNext = () => {
+        if (canScrollRight) setCurrentIndex((i) => i + PAGE_SIZE);
+    };
+
+    useEffect(() => {
+        if (!recipes || recipes.length <= PAGE_SIZE) return;
+        const id = setInterval(() => {
+            setCurrentIndex((i) => (i + PAGE_SIZE >= recipes.length ? 0 : i + PAGE_SIZE));
+        }, 10000);
+        return () => clearInterval(id);
+    }, [recipes]);
 
     return (
         <Box sx={{
@@ -100,6 +119,7 @@ const FeaturedRecipes = ({
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Box
+                            onClick={handlePrev}
                             sx={{
                                 width: '22px',
                                 height: '22px',
@@ -112,9 +132,10 @@ const FeaturedRecipes = ({
                                 backgroundColor: 'transparent',
                             }}
                         >
-                            <ChevronLeft />
+                            <ChevronLeft active={canScrollLeft} />
                         </Box>
                         <Box
+                            onClick={handleNext}
                             sx={{
                                 width: '22px',
                                 height: '22px',
@@ -127,16 +148,24 @@ const FeaturedRecipes = ({
                                 backgroundColor: 'transparent',
                             }}
                         >
-                            <ChevronRight />
+                            <ChevronRight active={canScrollRight} />
                         </Box>
                     </Box>
                 </Box>
 
-                <Box sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '10px',
-                }}>
+                <Box
+                    key={currentIndex}
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: '10px',
+                        '@keyframes carouselFadeIn': {
+                            from: { opacity: 0, transform: 'translateY(10px)' },
+                            to:   { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        animation: 'carouselFadeIn 0.4s ease-out',
+                    }}
+                >
                     {isLoading && (
                         <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
                             Carregando receitas...

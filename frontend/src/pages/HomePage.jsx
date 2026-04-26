@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/HomePage/Hero';
 import FeaturedRecipes from '@/components/HomePage/FeaturedRecipes/FeaturedRecipes';
@@ -18,10 +18,20 @@ import {
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, user } = useAuth();
     const [recipes, setRecipes] = useState([]);
     const [isLoadingRecipes, setIsLoadingRecipes] = useState(true);
     const [recipesError, setRecipesError] = useState('');
+
+    useEffect(() => {
+        const scrollTarget = location.state?.scrollTo;
+        if (!scrollTarget) return;
+        navigate('.', { replace: true, state: {} });
+        setTimeout(() => {
+            document.getElementById(scrollTarget)?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }, [location.state?.scrollTo]);
 
     const handleSearch = (_query) => {};
 
