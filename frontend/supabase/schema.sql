@@ -24,13 +24,33 @@ exception
   when duplicate_object then null;
 end $$;
 
+create table if not exists public.recipe_categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipe_categories_name_key'
+       and conrelid = 'public.recipe_categories'::regclass
+  ) then
+    alter table public.recipe_categories
+      add constraint recipe_categories_name_key unique (name);
+  end if;
+end $$;
+
 create table if not exists public.recipes (
   id uuid primary key default gen_random_uuid(),
   author_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   description text not null default '',
   category text,
-  difficulty text,
+  difficulty text not null default 'Fácil',
   prep_time_minutes integer not null default 0,
   portions integer not null default 0,
   average_rating numeric(2, 1) not null default 0,
@@ -70,6 +90,7 @@ create table if not exists public.favorite_recipes (
 );
 
 create index if not exists recipes_author_id_idx on public.recipes (author_id);
+create index if not exists recipes_category_idx on public.recipes (category);
 create index if not exists recipes_created_at_idx on public.recipes (created_at desc);
 create index if not exists recipe_ingredients_recipe_id_idx on public.recipe_ingredients (recipe_id, sort_order);
 create index if not exists recipe_steps_recipe_id_idx on public.recipe_steps (recipe_id, sort_order);
@@ -78,6 +99,7 @@ create index if not exists favorite_recipes_user_id_idx on public.favorite_recip
 create index if not exists favorite_recipes_recipe_id_idx on public.favorite_recipes (recipe_id);
 
 alter table public.profiles enable row level security;
+alter table public.recipe_categories enable row level security;
 alter table public.recipes enable row level security;
 alter table public.recipe_ingredients enable row level security;
 alter table public.recipe_steps enable row level security;
@@ -158,12 +180,82 @@ on conflict (id) do update
       full_name = coalesce(excluded.full_name, public.profiles.full_name),
       updated_at = timezone('utc', now());
 
+insert into public.recipe_categories (name)
+values
+  ('Entradas'),
+  ('Pratos principais'),
+  ('Sobremesas'),
+  ('Saladas'),
+  ('Lanches'),
+  ('Bebidas')
+on conflict (name) do nothing;
+
+update public.recipes
+   set category = btrim(category)
+ where category is not null
+   and category <> btrim(category);
+
+insert into public.recipe_categories (name)
+select distinct category
+  from public.recipes
+ where category is not null
+   and btrim(category) <> ''
+on conflict (name) do nothing;
+
+update public.recipes
+   set difficulty = case
+     when difficulty is null or btrim(difficulty) = '' then 'Fácil'
+     when lower(btrim(difficulty)) in ('facil', 'fácil') then 'Fácil'
+     when lower(btrim(difficulty)) in ('medio', 'médio') then 'Médio'
+     when lower(btrim(difficulty)) in ('dificil', 'difícil') then 'Difícil'
+     else 'Fácil'
+   end;
+
+alter table public.recipes
+  alter column difficulty set default 'Fácil';
+
+alter table public.recipes
+  alter column difficulty set not null;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipes_difficulty_check'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_difficulty_check
+      check (difficulty in ('Fácil', 'Médio', 'Difícil'));
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'recipes_category_fkey'
+       and conrelid = 'public.recipes'::regclass
+  ) then
+    alter table public.recipes
+      add constraint recipes_category_fkey
+      foreign key (category)
+      references public.recipe_categories(name)
+      on update cascade;
+  end if;
+end $$;
+
 grant usage on schema public to anon, authenticated;
 revoke select on public.profiles from anon;
 revoke insert, update on public.profiles from authenticated;
 grant select on public.profiles to authenticated;
 grant insert (id, email, full_name) on public.profiles to authenticated;
 grant update (email, full_name, updated_at) on public.profiles to authenticated;
+revoke all on public.recipe_categories from anon, authenticated;
+grant select on public.recipe_categories to anon, authenticated;
+grant insert, update, delete on public.recipe_categories to authenticated;
 grant select on public.recipes, public.recipe_ingredients, public.recipe_steps, public.recipe_images to anon, authenticated;
 grant insert, update, delete on public.recipes, public.recipe_ingredients, public.recipe_steps, public.recipe_images to authenticated;
 grant select, insert, delete on public.favorite_recipes to authenticated;
@@ -190,6 +282,35 @@ for update
 to authenticated
 using ((select auth.uid()) = id)
 with check ((select auth.uid()) = id);
+
+drop policy if exists "recipe_categories_select_all" on public.recipe_categories;
+create policy "recipe_categories_select_all"
+on public.recipe_categories
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "recipe_categories_insert_admin" on public.recipe_categories;
+create policy "recipe_categories_insert_admin"
+on public.recipe_categories
+for insert
+to authenticated
+with check ((select private.is_admin()));
+
+drop policy if exists "recipe_categories_update_admin" on public.recipe_categories;
+create policy "recipe_categories_update_admin"
+on public.recipe_categories
+for update
+to authenticated
+using ((select private.is_admin()))
+with check ((select private.is_admin()));
+
+drop policy if exists "recipe_categories_delete_admin" on public.recipe_categories;
+create policy "recipe_categories_delete_admin"
+on public.recipe_categories
+for delete
+to authenticated
+using ((select private.is_admin()));
 
 drop policy if exists "recipes_select_published_or_owner" on public.recipes;
 create policy "recipes_select_published_or_owner"

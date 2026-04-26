@@ -42,6 +42,114 @@ function normalizeOrder(items) {
         }));
 }
 
+function normalizeCategoryName(name) {
+    return name.trim().replace(/\s+/g, ' ');
+}
+
+export async function listRecipeCategories() {
+    const client = requireSupabase();
+    const { data, error } = await client
+        .from('recipe_categories')
+        .select('id, name')
+        .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    return data || [];
+}
+
+export async function createRecipeCategory(name) {
+    const client = requireSupabase();
+    const categoryName = normalizeCategoryName(name);
+
+    if (!categoryName) {
+        throw new Error('Informe o nome da categoria.');
+    }
+
+    const { data, error } = await client
+        .from('recipe_categories')
+        .insert({ name: categoryName })
+        .select('id, name')
+        .single();
+
+    if (!error) return data;
+
+    if (error.code === '23505') {
+        const { data: existingCategory, error: existingCategoryError } = await client
+            .from('recipe_categories')
+            .select('id, name')
+            .eq('name', categoryName)
+            .single();
+
+        if (!existingCategoryError && existingCategory) {
+            return existingCategory;
+        }
+    }
+
+    throw error;
+}
+
+export async function updateRecipeCategory({ categoryId, name }) {
+    const client = requireSupabase();
+    const categoryName = normalizeCategoryName(name);
+
+    if (!categoryId) {
+        throw new Error('Categoria invalida.');
+    }
+
+    if (!categoryName) {
+        throw new Error('Informe o nome da categoria.');
+    }
+
+    const { data, error } = await client
+        .from('recipe_categories')
+        .update({
+            name: categoryName,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', categoryId)
+        .select('id, name')
+        .single();
+
+    if (error?.code === '23505') {
+        throw new Error('Essa categoria ja existe.');
+    }
+
+    if (error) throw error;
+
+    return data;
+}
+
+export async function deleteRecipeCategory({ categoryId, name }) {
+    const client = requireSupabase();
+
+    if (!categoryId) {
+        throw new Error('Categoria invalida.');
+    }
+
+    const { count, error: countError } = await client
+        .from('recipes')
+        .select('id', { count: 'exact', head: true })
+        .eq('category', name);
+
+    if (countError) throw countError;
+
+    if ((count || 0) > 0) {
+        throw new Error('Nao e possivel excluir uma categoria usada por receitas.');
+    }
+
+    const { error } = await client
+        .from('recipe_categories')
+        .delete()
+        .eq('id', categoryId);
+
+    if (error?.code === '23503') {
+        throw new Error('Nao e possivel excluir uma categoria usada por receitas.');
+    }
+
+    if (error) throw error;
+}
+
 async function uploadRecipeImages(client, { authorId, recipeId, files }) {
     if (!files.length) return [];
 

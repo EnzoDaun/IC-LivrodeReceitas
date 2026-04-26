@@ -3,14 +3,21 @@ import {
     Alert,
     Box,
     Button,
+    MenuItem,
     Paper,
     TextField,
     Typography,
 } from '@mui/material';
+import CategoryIcon from '@mui/icons-material/Category';
 import { useNavigate } from 'react-router-dom';
 import { FONT_PRIMARY, COLOR_ORANGE } from '@/config/constants/styles';
 import { useAuth } from '@/hooks/useAuth';
-import { createRecipe, updateRecipe } from '@/services/supabase/recipeService';
+import {
+    createRecipe,
+    listRecipeCategories,
+    updateRecipe,
+} from '@/services/supabase/recipeService';
+import CategoryManagerDialog from '@/components/AddRecipe/CategoryManagerDialog';
 
 const cardSx = {
     width: '100%',
@@ -51,6 +58,8 @@ const emptyFormValues = {
     portions: '',
 };
 
+const difficultyOptions = ['Fácil', 'Médio', 'Difícil'];
+
 function mapCollectionToInputs(collection) {
     const values = (collection || [])
         .slice()
@@ -59,6 +68,12 @@ function mapCollectionToInputs(collection) {
         .filter(Boolean);
 
     return values.length > 0 ? values : [''];
+}
+
+function sortCategories(categories) {
+    return [...categories].sort((firstCategory, secondCategory) => (
+        firstCategory.name.localeCompare(secondCategory.name, 'pt-BR')
+    ));
 }
 
 function SectionTitle({ children }) {
@@ -111,6 +126,55 @@ function FormField({
                     ...extraSx,
                 }}
             />
+        </Box>
+    );
+}
+
+function SelectField({
+    label,
+    height = 40,
+    value,
+    onChange,
+    options,
+    placeholder,
+    disabled = false,
+}) {
+    return (
+        <Box>
+            <FieldLabel>{label}</FieldLabel>
+            <TextField
+                select
+                variant="outlined"
+                fullWidth
+                value={value}
+                onChange={onChange}
+                disabled={disabled}
+                SelectProps={{ displayEmpty: true }}
+                sx={{
+                    ...inputSx,
+                    '& .MuiInputBase-root': { height: `${height}px` },
+                    '& .MuiSelect-select': {
+                        height: `${height}px`,
+                        minHeight: `${height}px !important`,
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        alignItems: 'center',
+                        p: '0 12px',
+                        fontFamily: FONT_PRIMARY,
+                        fontSize: '14px',
+                        color: value ? '#111111' : '#666666',
+                    },
+                }}
+            >
+                <MenuItem value="" disabled>
+                    {placeholder}
+                </MenuItem>
+                {options.map((option) => (
+                    <MenuItem key={option} value={option}>
+                        {option}
+                    </MenuItem>
+                ))}
+            </TextField>
         </Box>
     );
 }
@@ -169,6 +233,42 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+    const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+    const categoryNames = categories.map((category) => category.name);
+    const categoryOptions = formValues.category && !categoryNames.includes(formValues.category)
+        ? [formValues.category, ...categoryNames]
+        : categoryNames;
+
+    useEffect(() => {
+        let isMounted = true;
+
+        async function loadCategories() {
+            try {
+                setIsLoadingCategories(true);
+                const nextCategories = await listRecipeCategories();
+
+                if (isMounted) {
+                    setCategories(sortCategories(nextCategories));
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setErrorMessage(error.message || 'Nao foi possivel carregar as categorias.');
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoadingCategories(false);
+                }
+            }
+        }
+
+        loadCategories();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     useEffect(() => {
         if (!isEditMode || !initialRecipe) return;
@@ -197,6 +297,17 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
         setFiles(Array.from(event.target.files || []).slice(0, 5));
     };
 
+    const handleCategoriesChange = (nextCategories) => {
+        setCategories(sortCategories(nextCategories));
+    };
+
+    const handleSelectCategory = (categoryName) => {
+        setFormValues((currentValues) => ({
+            ...currentValues,
+            category: categoryName,
+        }));
+    };
+
     const handleSubmit = async () => {
         setErrorMessage('');
         setSuccessMessage('');
@@ -212,11 +323,22 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                 throw new Error('Informe a descricao da receita.');
             }
 
+            const selectedCategory = formValues.category.trim();
+            const selectedDifficulty = formValues.difficulty.trim();
+
+            if (!categoryOptions.includes(selectedCategory)) {
+                throw new Error('Selecione uma categoria cadastrada.');
+            }
+
+            if (!difficultyOptions.includes(selectedDifficulty)) {
+                throw new Error('Selecione uma dificuldade: Fácil, Médio ou Difícil.');
+            }
+
             const payload = {
                 title: formValues.title.trim(),
                 description: formValues.description.trim(),
-                category: formValues.category.trim(),
-                difficulty: formValues.difficulty.trim(),
+                category: selectedCategory,
+                difficulty: selectedDifficulty,
                 prepTimeMinutes: Number(formValues.prepTimeMinutes || 0),
                 portions: Number(formValues.portions || 0),
                 ingredients,
@@ -272,12 +394,43 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <FormField label="Titulo da receita" height={26} value={formValues.title} onChange={handleFieldChange('title')} />
                     <FormField label="Descricao" multiline rows={2} value={formValues.description} onChange={handleFieldChange('description')} />
-                    <Box sx={{ display: 'flex', gap: '16px' }}>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '16px' }}>
                         <Box sx={{ flex: 1 }}>
-                            <FormField label="Categoria" height={26} value={formValues.category} onChange={handleFieldChange('category')} />
+                            <SelectField
+                                label="Categoria"
+                                height={26}
+                                value={formValues.category}
+                                onChange={handleFieldChange('category')}
+                                options={categoryOptions}
+                                placeholder={isLoadingCategories ? 'Carregando categorias...' : 'Selecione uma categoria'}
+                                disabled={isLoadingCategories}
+                            />
+                            <Button
+                                onClick={() => setIsCategoryManagerOpen(true)}
+                                startIcon={<CategoryIcon fontSize="small" />}
+                                sx={{
+                                    mt: '6px',
+                                    minHeight: '28px',
+                                    px: 0,
+                                    color: COLOR_ORANGE,
+                                    fontFamily: FONT_PRIMARY,
+                                    fontSize: '12px',
+                                    fontWeight: 700,
+                                    textTransform: 'none',
+                                }}
+                            >
+                                Gerenciar Categorias
+                            </Button>
                         </Box>
                         <Box sx={{ flex: 1 }}>
-                            <FormField label="Dificuldade" height={26} value={formValues.difficulty} onChange={handleFieldChange('difficulty')} placeholder="Facil, Medio, Dificil" />
+                            <SelectField
+                                label="Dificuldade"
+                                height={26}
+                                value={formValues.difficulty}
+                                onChange={handleFieldChange('difficulty')}
+                                options={difficultyOptions}
+                                placeholder="Selecione a dificuldade"
+                            />
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: '16px' }}>
@@ -378,6 +531,15 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             >
                 {isSubmitting ? 'Salvando...' : (isEditMode ? 'Atualizar receita' : 'Salvar receita')}
             </Button>
+
+            <CategoryManagerDialog
+                open={isCategoryManagerOpen}
+                categories={categories}
+                selectedCategory={formValues.category}
+                onClose={() => setIsCategoryManagerOpen(false)}
+                onCategoriesChange={handleCategoriesChange}
+                onSelectCategory={handleSelectCategory}
+            />
         </Box>
     );
 };
