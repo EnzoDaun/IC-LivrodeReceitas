@@ -145,6 +145,20 @@ create table if not exists public.favorite_recipes (
   primary key (user_id, recipe_id)
 );
 
+create table if not exists public.ebook_leads (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  user_id uuid references auth.users(id) on delete set null,
+  source text not null default 'ebook_dialog',
+  ebook_path text not null default '/assets/ebooks/ebook-teste.pdf',
+  delivery_status text not null default 'pending',
+  provider_message_id text,
+  error_message text,
+  created_at timestamptz not null default timezone('utc', now()),
+  sent_at timestamptz,
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
 create index if not exists recipes_author_id_idx on public.recipes (author_id);
 create index if not exists recipes_category_idx on public.recipes (category);
 create index if not exists recipes_created_at_idx on public.recipes (created_at desc);
@@ -153,6 +167,9 @@ create index if not exists recipe_steps_recipe_id_idx on public.recipe_steps (re
 create index if not exists recipe_images_recipe_id_idx on public.recipe_images (recipe_id, sort_order);
 create index if not exists favorite_recipes_user_id_idx on public.favorite_recipes (user_id);
 create index if not exists favorite_recipes_recipe_id_idx on public.favorite_recipes (recipe_id);
+create index if not exists ebook_leads_email_idx on public.ebook_leads (email);
+create index if not exists ebook_leads_user_id_idx on public.ebook_leads (user_id);
+create index if not exists ebook_leads_created_at_idx on public.ebook_leads (created_at desc);
 
 alter table public.profiles enable row level security;
 alter table public.recipe_categories enable row level security;
@@ -161,6 +178,7 @@ alter table public.recipe_ingredients enable row level security;
 alter table public.recipe_steps enable row level security;
 alter table public.recipe_images enable row level security;
 alter table public.favorite_recipes enable row level security;
+alter table public.ebook_leads enable row level security;
 
 create schema if not exists private;
 revoke all on schema private from public;
@@ -406,6 +424,62 @@ begin
   end if;
 end $$;
 
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'ebook_leads_email_length_check'
+       and conrelid = 'public.ebook_leads'::regclass
+  ) then
+    alter table public.ebook_leads
+      add constraint ebook_leads_email_length_check
+      check (char_length(email) <= 254);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'ebook_leads_email_format_check'
+       and conrelid = 'public.ebook_leads'::regclass
+  ) then
+    alter table public.ebook_leads
+      add constraint ebook_leads_email_format_check
+      check (email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]{2,}$');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'ebook_leads_source_length_check'
+       and conrelid = 'public.ebook_leads'::regclass
+  ) then
+    alter table public.ebook_leads
+      add constraint ebook_leads_source_length_check
+      check (char_length(btrim(source)) between 2 and 80);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1
+      from pg_constraint
+     where conname = 'ebook_leads_delivery_status_check'
+       and conrelid = 'public.ebook_leads'::regclass
+  ) then
+    alter table public.ebook_leads
+      add constraint ebook_leads_delivery_status_check
+      check (delivery_status in ('pending', 'sent', 'failed'));
+  end if;
+end $$;
+
 grant usage on schema public to anon, authenticated;
 revoke select on public.profiles from anon;
 revoke insert, update on public.profiles from authenticated;
@@ -415,6 +489,8 @@ grant update (email, full_name, updated_at) on public.profiles to authenticated;
 revoke all on public.recipe_categories from anon, authenticated;
 grant select on public.recipe_categories to anon, authenticated;
 grant insert, update, delete on public.recipe_categories to authenticated;
+revoke all on public.ebook_leads from anon, authenticated;
+grant select on public.ebook_leads to authenticated;
 grant select on public.recipes, public.recipe_ingredients, public.recipe_steps, public.recipe_images to anon, authenticated;
 grant insert, update, delete on public.recipes, public.recipe_ingredients, public.recipe_steps, public.recipe_images to authenticated;
 grant select, insert, delete on public.favorite_recipes to authenticated;
@@ -708,6 +784,13 @@ on public.favorite_recipes
 for delete
 to authenticated
 using ((select auth.uid()) = user_id);
+
+drop policy if exists "ebook_leads_select_admin" on public.ebook_leads;
+create policy "ebook_leads_select_admin"
+on public.ebook_leads
+for select
+to authenticated
+using ((select private.is_admin()));
 
 insert into storage.buckets (id, name, public)
 values ('recipe-images', 'recipe-images', true)

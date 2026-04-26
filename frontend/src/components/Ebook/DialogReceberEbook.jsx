@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -20,17 +20,28 @@ import {
     normalizeEmail,
     validateEmail,
 } from '@/utils/validation';
+import { useAuth } from '@/hooks/useAuth';
+import { sendEbookLead } from '@/services/supabase/leadService';
 
 const DialogReceberEbook = ({ open, onClose }) => {
+    const { user } = useAuth();
+    const accountEmail = user?.email || '';
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
     const [sent, setSent] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (open && accountEmail && !email) {
+            setEmail(accountEmail);
+        }
+    }, [accountEmail, email, open]);
 
     const handleClose = () => {
         onClose();
     };
 
-    const handleSend = () => {
+    const handleSend = async () => {
         const nextEmailError = validateEmail(email);
 
         if (nextEmailError) {
@@ -38,15 +49,25 @@ const DialogReceberEbook = ({ open, onClose }) => {
             return;
         }
 
-        setEmailError('');
-        setEmail(normalizeEmail(email));
-        setSent(true);
+        try {
+            setIsSubmitting(true);
+            setEmailError('');
+            const normalizedEmail = normalizeEmail(email);
+            await sendEbookLead({ email: normalizedEmail });
+            setEmail(normalizedEmail);
+            setSent(true);
+        } catch (error) {
+            setEmailError(error.message || 'Nao foi possivel enviar o e-book.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleExited = () => {
         setEmail('');
         setEmailError('');
         setSent(false);
+        setIsSubmitting(false);
     };
 
     return (
@@ -112,6 +133,30 @@ const DialogReceberEbook = ({ open, onClose }) => {
                                 },
                             }}
                         />
+                        {accountEmail && (
+                            <Button
+                                onClick={() => {
+                                    setEmail(accountEmail);
+                                    setEmailError('');
+                                }}
+                                variant="outlined"
+                                sx={{
+                                    alignSelf: 'flex-start',
+                                    borderRadius: '10px',
+                                    textTransform: 'none',
+                                    fontFamily: FONT_SANS,
+                                    fontWeight: 600,
+                                    borderColor: '#CEC7BA',
+                                    color: 'text.secondary',
+                                    '&:hover': {
+                                        borderColor: 'text.secondary',
+                                        backgroundColor: 'transparent',
+                                    },
+                                }}
+                            >
+                                Usar email da conta: {accountEmail}
+                            </Button>
+                        )}
                     </Box>
                 ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5, py: 2 }}>
@@ -140,9 +185,10 @@ const DialogReceberEbook = ({ open, onClose }) => {
                     <Button
                         onClick={handleSend}
                         variant="contained"
+                        disabled={isSubmitting}
                         sx={{ borderRadius: '10px', textTransform: 'none', fontFamily: FONT_SANS, fontWeight: 600, backgroundColor: 'sustainable.main', boxShadow: 'none', '&:hover': { backgroundColor: 'sustainable.dark', boxShadow: 'none' } }}
                     >
-                        Enviar e-book
+                        {isSubmitting ? 'Enviando...' : 'Enviar e-book'}
                     </Button>
                 </DialogActions>
             ) : (
