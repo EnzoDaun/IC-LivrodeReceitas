@@ -1,6 +1,7 @@
 import { FONT_PRIMARY } from '@/config/constants/styles';
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function AboutSection() {
     return (
@@ -77,11 +78,13 @@ export default function AboutSection() {
                         lineHeight: '17px',
                         maxWidth: '260px',
                     }}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum,ac aliquet odio mattis.
+                        Da cozinha afetiva ao cuidado com o alimento por inteiro. Aqui, cascas, talos, sementes e sobras viram preparo, memória e escolhas mais sustentáveis.
                     </Typography>
 
                     {/* Botão */}
                     <Button
+                        component={RouterLink}
+                        to="/sobre"
                         disableElevation
                         disableRipple
                         sx={{
