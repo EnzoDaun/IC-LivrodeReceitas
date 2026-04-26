@@ -31,7 +31,7 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
     return (
         <Box sx={{
             width: '100%',
-            borderRadius: '10px',
+            borderRadius: '8px',
             overflow: 'hidden',
             backgroundColor: '#FFFBF2',
             display: 'flex',
@@ -60,6 +60,8 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                         fontWeight: 800,
                         color: '#262626',
                         lineHeight: '22px',
+                        minWidth: 0,
+                        overflowWrap: 'anywhere',
                     }}>
                         {recipe.title}
                     </Typography>
@@ -81,11 +83,13 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
 
                 <Box sx={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
                     justifyContent: 'space-between',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: '8px', sm: '10px' },
                     mt: '12px',
                 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0, minHeight: '18px' }}>
                         {Array.from({ length: 5 }, (_, i) => (
                             <Box
                                 key={i}
@@ -124,7 +128,7 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                         disableElevation
                         disableRipple
                         sx={{
-                            width: '82px',
+                            width: { xs: '100%', sm: '82px' },
                             height: '26px',
                             borderRadius: '999px',
                             border: '1px solid #222222',
@@ -138,6 +142,7 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                             minWidth: 'unset',
                             p: 0,
                             boxShadow: 'none',
+                            alignSelf: { xs: 'stretch', sm: 'center' },
                             '&:hover': {
                                 backgroundColor: 'rgba(34,34,34,0.05)',
                                 border: '1px solid #222222',

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Button, Stack, Chip, Menu, MenuItem } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { listRecipeCategories } from '@/services/supabase/recipeService';
+import RecipePaginationControls from '@/components/Recipes/RecipePaginationControls';
+import { PAGE_SIZE_OPTIONS } from '@/components/Recipes/recipeListControlOptions';
 import JourneyCard from './JourneyCard';
 
 const maxVisibleCategoryFilters = 6;
@@ -24,6 +26,8 @@ export default function Journey({
     const [isLoadingCategories, setIsLoadingCategories] = useState(false);
     const [categoriesError, setCategoriesError] = useState('');
     const [categoryMenuAnchor, setCategoryMenuAnchor] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
     const categoryFilters = useMemo(() => ([
         { label: 'TODAS', value: 'TODAS' },
         ...categories.map((category) => ({
@@ -76,6 +80,20 @@ export default function Journey({
             normalizeFilter(recipe.category) === activeFilter
         ));
     }, [activeFilter, recipes]);
+
+    const totalPages = Math.max(1, Math.ceil(displayedRecipes.length / pageSize));
+    const pageStartIndex = (currentPage - 1) * pageSize;
+    const paginatedRecipes = displayedRecipes.slice(pageStartIndex, pageStartIndex + pageSize);
+    const displayedStart = displayedRecipes.length === 0 ? 0 : pageStartIndex + 1;
+    const displayedEnd = Math.min(pageStartIndex + pageSize, displayedRecipes.length);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeFilter, pageSize]);
+
+    useEffect(() => {
+        setCurrentPage((page) => Math.min(page, totalPages));
+    }, [totalPages]);
 
     const handleSelectFilter = (filterValue) => {
         setActiveFilter(filterValue);
@@ -221,7 +239,7 @@ export default function Journey({
                         Nenhuma receita encontrada para este filtro.
                     </Typography>
                 )}
-                {displayedRecipes.map((recipe) => (
+                {paginatedRecipes.map((recipe) => (
                     <JourneyCard
                         key={recipe.id}
                         recipe={recipe}
@@ -229,6 +247,22 @@ export default function Journey({
                     />
                 ))}
             </Box>
+
+            {!isLoading && !errorMessage && displayedRecipes.length > 0 && (
+                <RecipePaginationControls
+                    bottomSpacing="0"
+                    displayedEnd={displayedEnd}
+                    displayedStart={displayedStart}
+                    idPrefix="journey-recipes"
+                    onPageChange={setCurrentPage}
+                    onPageSizeChange={setPageSize}
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizeOptions={PAGE_SIZE_OPTIONS}
+                    totalItems={displayedRecipes.length}
+                    totalPages={totalPages}
+                />
+            )}
         </Box>
     );
 }

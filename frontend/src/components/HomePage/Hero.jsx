@@ -13,7 +13,7 @@ const Hero = ({
         <Box
             sx={{
                 mt: 3,
-                borderRadius: '24px',
+                borderRadius: { xs: '18px', md: '24px' },
                 overflow: 'hidden',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
             }}
@@ -24,7 +24,7 @@ const Hero = ({
                     backgroundImage: `url(${backgroundImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    height: { xs: 340, md: 460 },
+                    height: { xs: 320, md: 460 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -47,8 +47,8 @@ const Hero = ({
                             color: '#F05E46',
                             fontWeight: 800,
                             lineHeight: 1.05,
-                            fontSize: { xs: 44, sm: 58, md: 70 },
-                            letterSpacing: '-1.5px',
+                            fontSize: { xs: 38, sm: 58, md: 70 },
+                            letterSpacing: 0,
                             textShadow: '0px 2px 4px rgba(0, 0, 0, 0.15)',
                             mb: 2.5,
                         }}

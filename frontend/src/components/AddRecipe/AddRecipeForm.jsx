@@ -33,7 +33,7 @@ const cardSx = {
     borderRadius: '7px',
     boxShadow: '0px 2px 8px rgba(0,0,0,0.08)',
     backgroundColor: '#FFFFFF',
-    p: '20px 20px 24px 20px',
+    p: { xs: '16px', sm: '20px 20px 24px 20px' },
     boxSizing: 'border-box',
 };
 
@@ -204,11 +204,11 @@ function DynamicListSection({ title, addLabel, items, onChange, placeholder, err
     return (
         <Paper elevation={0} sx={cardSx}>
             <SectionTitle>{title}</SectionTitle>
-            <Box sx={{ pl: '28px' }}>
+            <Box sx={{ pl: { xs: 0, sm: '28px' } }}>
                 <FieldLabel>{placeholder}</FieldLabel>
             </Box>
             {items.map((item, index) => (
-                <Box key={`${title}-${index}`} sx={{ display: 'flex', alignItems: 'center', gap: '6px', mb: '6px' }}>
+                <Box key={`${title}-${index}`} sx={{ display: 'flex', alignItems: 'flex-start', gap: '6px', mb: '6px' }}>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', fontWeight: 500, color: '#222222', flexShrink: 0, width: '22px' }}>
                         {index + 1}.
                     </Typography>
@@ -243,7 +243,7 @@ function DynamicListSection({ title, addLabel, items, onChange, placeholder, err
             ))}
             <Typography
                 onClick={() => onChange([...items, ''])}
-                sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: COLOR_ORANGE, cursor: 'pointer', mt: '12px', pl: '28px' }}
+                sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: COLOR_ORANGE, cursor: 'pointer', mt: '12px', pl: { xs: 0, sm: '28px' } }}
             >
                 {addLabel}
             </Typography>
@@ -481,9 +481,9 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
     };
 
     return (
-        <Box sx={{ maxWidth: '680px', mt: '32px', mx: 'auto' }}>
+        <Box sx={{ width: '100%', maxWidth: '680px', mt: { xs: '28px', md: '32px' }, mx: 'auto' }}>
             <Box sx={{ mb: '16px' }}>
-                <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '24px', fontWeight: 800, color: '#111111', lineHeight: '28px' }}>
+                <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '22px', md: '24px' }, fontWeight: 800, color: '#111111', lineHeight: { xs: '26px', md: '28px' } }}>
                     {isEditMode ? 'Editar receita' : '+ Adicionar nova receita'}
                 </Typography>
                 <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', fontWeight: 400, color: '#333333', lineHeight: '18px' }}>
@@ -562,7 +562,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                             />
                         </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: '16px' }}>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '16px' }}>
                         <Box sx={{ flex: 1 }}>
                             <FormField
                                 label="Tempo de preparo (min)"
@@ -615,7 +615,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                     }}
                 >
                     <Typography sx={{ fontSize: '28px', mb: '8px', lineHeight: 1 }}>+</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flexWrap: 'wrap', px: '8px' }}>
                         <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: COLOR_ORANGE }}>
                             Clique aqui
                         </Typography>

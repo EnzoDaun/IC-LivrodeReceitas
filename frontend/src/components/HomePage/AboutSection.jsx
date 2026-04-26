@@ -14,24 +14,30 @@ export default function AboutSection() {
             {/* Container principal */}
             <Box sx={{
                 width: '100%',
-                height: '523px',
+                height: { xs: 'auto', md: '523px' },
                 border: '1px solid #CEC7BA',
-                borderRadius: '28px',
-                position: 'relative',
+                borderRadius: { xs: '18px', md: '28px' },
+                position: { xs: 'static', md: 'relative' },
                 overflow: 'hidden',
                 boxSizing: 'border-box',
+                display: { xs: 'flex', md: 'block' },
+                flexDirection: { xs: 'column', md: 'initial' },
+                gap: { xs: '12px', md: 0 },
+                p: { xs: '12px', md: 0 },
             }}>
 
                 {/* ── BLOCO DE TEXTO ── */}
                 <Box sx={{
-                    position: 'absolute',
-                    left: '30px',
-                    top: '49px',
-                    width: '340px',
+                    position: { xs: 'static', md: 'absolute' },
+                    left: { md: '30px' },
+                    top: { md: '49px' },
+                    width: { xs: '100%', md: '340px' },
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',
                     gap: '8px',
+                    p: { xs: '8px 4px 2px', md: 0 },
+                    boxSizing: 'border-box',
                 }}>
                     {/* Badge */}
                     <Box sx={{
@@ -59,11 +65,10 @@ export default function AboutSection() {
                     {/* Título */}
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
-                        fontSize: '29px',
+                        fontSize: { xs: '24px', sm: '26px', md: '29px' },
                         fontWeight: 900,
                         color: '#2D2D2D',
-                        lineHeight: '30px',
-                        letterSpacing: '-0.5px',
+                        lineHeight: { xs: '26px', sm: '28px', md: '30px' },
                         textTransform: 'uppercase',
                     }}>
                         NOSSA HISTÓRIA<br />E PROPÓSITO
@@ -76,7 +81,7 @@ export default function AboutSection() {
                         fontWeight: 400,
                         color: '#4F4F4F',
                         lineHeight: '17px',
-                        maxWidth: '260px',
+                        maxWidth: { xs: '100%', sm: '420px', md: '260px' },
                     }}>
                         Da cozinha afetiva ao cuidado com o alimento por inteiro. Aqui, cascas, talos, sementes e sobras viram preparo, memória e escolhas mais sustentáveis.
                     </Typography>
@@ -89,7 +94,7 @@ export default function AboutSection() {
                         disableRipple
                         sx={{
                             mt: '4px',
-                            width: '82px',
+                            width: { xs: '96px', md: '82px' },
                             height: '28px',
                             border: '1px solid #2D2D2D',
                             borderRadius: '999px',
@@ -120,15 +125,16 @@ export default function AboutSection() {
                     src="/assets/aboutus/salmon.png"
                     alt="Carne grelhada"
                     sx={{
-                        position: 'absolute',
-                        left: '458px',
-                        top: '12px',
-                        width: '260px',
-                        height: '244px',
-                        borderRadius: '15px',
+                        position: { xs: 'static', md: 'absolute' },
+                        left: { md: '458px' },
+                        top: { md: '12px' },
+                        width: { xs: '100%', sm: 'calc(50% - 6px)', md: '260px' },
+                        height: { xs: '190px', sm: '220px', md: '244px' },
+                        borderRadius: { xs: '12px', md: '15px' },
                         objectFit: 'cover',
                         objectPosition: 'center',
                         display: 'block',
+                        alignSelf: { xs: 'stretch', sm: 'flex-start' },
                     }}
                 />
 
@@ -138,15 +144,16 @@ export default function AboutSection() {
                     src="/assets/aboutus/chef.png"
                     alt="Chefs na cozinha"
                     sx={{
-                        position: 'absolute',
-                        right: '12px',
-                        top: '12px',
-                        width: '307px',
-                        height: '497px',
-                        borderRadius: '15px',
+                        position: { xs: 'static', md: 'absolute' },
+                        right: { md: '12px' },
+                        top: { md: '12px' },
+                        width: { xs: '100%', sm: 'calc(50% - 6px)', md: '307px' },
+                        height: { xs: '240px', sm: '280px', md: '497px' },
+                        borderRadius: { xs: '12px', md: '15px' },
                         objectFit: 'cover',
                         objectPosition: 'center',
                         display: 'block',
+                        alignSelf: { xs: 'stretch', sm: 'flex-end' },
                     }}
                 />
 
@@ -156,16 +163,16 @@ export default function AboutSection() {
                     src="/assets/aboutus/pan.png"
                     alt="Panela com legumes"
                     sx={{
-                        position: 'absolute',
-                        left: '12px',
-                        top: '264px',
-                        right: '331px',
-                        height: '247px',
-                        borderRadius: '15px',
+                        position: { xs: 'static', md: 'absolute' },
+                        left: { md: '12px' },
+                        top: { md: '264px' },
+                        right: { md: '331px' },
+                        height: { xs: '190px', sm: '220px', md: '247px' },
+                        borderRadius: { xs: '12px', md: '15px' },
                         objectFit: 'cover',
                         objectPosition: 'center',
                         display: 'block',
-                        width: 'calc(100% - 343px)',
+                        width: { xs: '100%', md: 'calc(100% - 343px)' },
                     }}
                 />
             </Box>

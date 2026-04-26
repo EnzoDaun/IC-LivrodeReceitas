@@ -8,7 +8,9 @@ import {
     Pagination,
     Select,
     Typography,
+    useMediaQuery,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { COLOR_ORANGE, FONT_PRIMARY } from '@/config/constants/styles';
 import {
     FILTER_MENU_PROPS,
@@ -29,39 +31,67 @@ function RecipePaginationControls({
     totalPages,
     bottomSpacing = '70px',
 }) {
+    const theme = useTheme();
+    const isCompact = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
         <Box sx={{
-            display: 'flex',
-            alignItems: { xs: 'stretch', sm: 'center' },
-            justifyContent: 'space-between',
-            gap: '14px',
-            flexDirection: { xs: 'column', sm: 'row' },
-            mt: '22px',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'auto 1fr auto' },
+            alignItems: 'center',
+            gap: { xs: '12px', sm: '14px' },
+            mt: '24px',
+            pt: '16px',
+            borderTop: '1px solid #E8E1D8',
             mb: bottomSpacing,
         }}>
-            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', color: '#6B6B6B' }}>
+            <Typography sx={{
+                fontFamily: FONT_PRIMARY,
+                fontSize: '12px',
+                color: '#6B6B6B',
+                textAlign: { xs: 'center', sm: 'left' },
+                whiteSpace: 'nowrap',
+            }}>
                 {`Mostrando ${displayedStart}-${displayedEnd} de ${totalItems}`}
             </Typography>
 
-            <Pagination
-                count={totalPages}
-                page={page}
-                onChange={(_, nextPage) => onPageChange(nextPage)}
-                siblingCount={1}
-                boundaryCount={1}
-                sx={{
-                    alignSelf: { xs: 'center', sm: 'auto' },
-                    '& .MuiPaginationItem-root': {
-                        fontFamily: FONT_PRIMARY,
-                    },
-                    '& .Mui-selected': {
-                        backgroundColor: `${COLOR_ORANGE} !important`,
-                        color: '#FFFFFF',
-                    },
-                }}
-            />
+            <Box sx={{ display: 'flex', justifyContent: 'center', minWidth: 0 }}>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={(_, nextPage) => onPageChange(nextPage)}
+                    siblingCount={isCompact ? 0 : 1}
+                    boundaryCount={1}
+                    size={isCompact ? 'small' : 'medium'}
+                    showFirstButton={!isCompact}
+                    showLastButton={!isCompact}
+                    sx={{
+                        '& .MuiPagination-ul': {
+                            justifyContent: 'center',
+                            flexWrap: 'wrap',
+                            gap: { xs: '2px', sm: '4px' },
+                        },
+                        '& .MuiPaginationItem-root': {
+                            fontFamily: FONT_PRIMARY,
+                            m: { xs: '1px', sm: '2px' },
+                        },
+                        '& .Mui-selected': {
+                            backgroundColor: `${COLOR_ORANGE} !important`,
+                            color: '#FFFFFF',
+                        },
+                    }}
+                />
+            </Box>
 
-            <FormControl size="small" sx={{ ...filterControlSx, minWidth: { xs: '100%', sm: 150 } }}>
+            <FormControl
+                size="small"
+                sx={{
+                    ...filterControlSx,
+                    width: { xs: '100%', sm: 150 },
+                    maxWidth: { xs: 220, sm: 150 },
+                    mx: { xs: 'auto', sm: 0 },
+                }}
+            >
                 <InputLabel id={`${idPrefix}-page-size-label`}>Por página</InputLabel>
                 <Select
                     labelId={`${idPrefix}-page-size-label`}

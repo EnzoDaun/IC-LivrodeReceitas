@@ -73,7 +73,7 @@ const FavoritesContent = () => {
 
     return (
         <>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px', mt: '40px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px', mt: { xs: '28px', md: '40px' } }}>
                 <Box
                     component="img"
                     src="/assets/favorites/favoriteicon.png"
@@ -83,17 +83,16 @@ const FavoritesContent = () => {
                 <Box>
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
-                        fontSize: '30px',
+                        fontSize: { xs: '24px', md: '30px' },
                         fontWeight: 800,
                         color: '#080C14',
-                        lineHeight: '35px',
-                        letterSpacing: '-0.4px',
+                        lineHeight: { xs: '29px', md: '35px' },
                     }}>
                         Receitas Favoritas
                     </Typography>
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
-                        fontSize: '16px',
+                        fontSize: { xs: '14px', md: '16px' },
                         fontWeight: 400,
                         color: '#111111',
                         lineHeight: '20px',
@@ -154,7 +153,8 @@ const FavoritesContent = () => {
                         disableRipple
                         sx={{
                             mt: '38px',
-                            width: '150px',
+                            width: { xs: '100%', sm: '150px' },
+                            maxWidth: '220px',
                             height: '44px',
                             backgroundColor: COLOR_ORANGE,
                             borderRadius: '6px',
@@ -177,7 +177,7 @@ const FavoritesContent = () => {
             )}
 
             {!isLoading && favoriteRecipes.length > 0 && (
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '14px', mt: '40px', mb: '80px' }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: '14px', mt: { xs: '28px', md: '40px' }, mb: '80px' }}>
                     {favoriteRecipes.map((recipe) => (
                         <RecipeCard
                             key={recipe.id}

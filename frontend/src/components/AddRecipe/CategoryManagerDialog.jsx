@@ -246,7 +246,7 @@ const CategoryManagerDialog = ({
                         <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', fontWeight: 800, color: '#222222', mb: '8px' }}>
                             Criar categoria
                         </Typography>
-                        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '8px', alignItems: { xs: 'stretch', sm: 'flex-start' } }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -277,7 +277,7 @@ const CategoryManagerDialog = ({
                                 startIcon={<AddIcon fontSize="small" />}
                                 sx={{
                                     height: '40px',
-                                    minWidth: '96px',
+                                    minWidth: { xs: '100%', sm: '96px' },
                                     backgroundColor: COLOR_ORANGE,
                                     color: '#FFFFFF',
                                     borderRadius: '6px',
@@ -322,7 +322,7 @@ const CategoryManagerDialog = ({
                                             backgroundColor: '#FFFFFF',
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, flexWrap: 'wrap', gap: '8px' }}>
                                             {isEditing ? (
                                                 <TextField
                                                     fullWidth
@@ -348,7 +348,7 @@ const CategoryManagerDialog = ({
                                                     sx={dialogInputSx}
                                                 />
                                             ) : (
-                                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Box sx={{ flex: '1 1 160px', minWidth: 0 }}>
                                                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', fontWeight: 700, color: '#222222', wordBreak: 'break-word' }}>
                                                         {category.name}
                                                     </Typography>
@@ -421,13 +421,13 @@ const CategoryManagerDialog = ({
                                                 <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', color: '#333333', mb: '8px' }}>
                                                     Excluir esta categoria? Categorias usadas por receitas nao podem ser excluidas.
                                                 </Typography>
-                                                <Box sx={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '8px', justifyContent: 'flex-end' }}>
                                                     <Button
                                                         onClick={() => handleDeleteCategory(category)}
                                                         disabled={busyAction === `delete-${category.id}`}
                                                         sx={{
                                                             height: '30px',
-                                                            minWidth: '94px',
+                                                            minWidth: { xs: '100%', sm: '94px' },
                                                             color: '#FFFFFF',
                                                             backgroundColor: '#9E2B25',
                                                             borderRadius: '6px',
@@ -444,7 +444,7 @@ const CategoryManagerDialog = ({
                                                         onClick={() => setDeleteCandidate(null)}
                                                         sx={{
                                                             height: '30px',
-                                                            minWidth: '84px',
+                                                            minWidth: { xs: '100%', sm: '84px' },
                                                             color: '#333333',
                                                             borderRadius: '6px',
                                                             fontFamily: FONT_PRIMARY,

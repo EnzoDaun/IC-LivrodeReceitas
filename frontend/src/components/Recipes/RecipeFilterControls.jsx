@@ -3,6 +3,7 @@ import React from 'react';
 import {
     Box,
     Button,
+    Collapse,
     FormControl,
     InputAdornment,
     InputLabel,
@@ -12,8 +13,10 @@ import {
     TextField,
 } from '@mui/material';
 import {
+    ExpandMore as ExpandMoreIcon,
     FilterAltOff as FilterAltOffIcon,
     Search as SearchIcon,
+    Tune as TuneIcon,
 } from '@mui/icons-material';
 import { COLOR_ORANGE, FONT_PRIMARY } from '@/config/constants/styles';
 import { VALIDATION_LIMITS } from '@/utils/validation';
@@ -70,9 +73,10 @@ function RecipeFilterControls({
     statusOptions = [],
     variant = 'public',
 }) {
+    const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
     const showStatus = statusOptions.length > 0;
     const flex = controlFlex[variant];
-    const content = (
+    const renderControls = (controlIdPrefix) => (
         <Box sx={{
             display: 'flex',
             alignItems: { xs: 'stretch', md: 'center' },
@@ -108,9 +112,9 @@ function RecipeFilterControls({
                     minWidth: { xs: '100%', md: variant === 'admin' ? 160 : 180 },
                 }}
             >
-                <InputLabel id={`${idPrefix}-category-filter-label`}>Categoria</InputLabel>
+                <InputLabel id={`${controlIdPrefix}-category-filter-label`}>Categoria</InputLabel>
                 <Select
-                    labelId={`${idPrefix}-category-filter-label`}
+                    labelId={`${controlIdPrefix}-category-filter-label`}
                     label="Categoria"
                     value={filters.category}
                     onChange={(event) => onFilterChange('category', event.target.value)}
@@ -133,9 +137,9 @@ function RecipeFilterControls({
                     minWidth: { xs: '100%', md: variant === 'admin' ? 150 : 160 },
                 }}
             >
-                <InputLabel id={`${idPrefix}-difficulty-filter-label`}>Dificuldade</InputLabel>
+                <InputLabel id={`${controlIdPrefix}-difficulty-filter-label`}>Dificuldade</InputLabel>
                 <Select
-                    labelId={`${idPrefix}-difficulty-filter-label`}
+                    labelId={`${controlIdPrefix}-difficulty-filter-label`}
                     label="Dificuldade"
                     value={filters.difficulty}
                     onChange={(event) => onFilterChange('difficulty', event.target.value)}
@@ -159,9 +163,9 @@ function RecipeFilterControls({
                         minWidth: { xs: '100%', md: 140 },
                     }}
                 >
-                    <InputLabel id={`${idPrefix}-status-filter-label`}>Status</InputLabel>
+                    <InputLabel id={`${controlIdPrefix}-status-filter-label`}>Status</InputLabel>
                     <Select
-                        labelId={`${idPrefix}-status-filter-label`}
+                        labelId={`${controlIdPrefix}-status-filter-label`}
                         label="Status"
                         value={filters.status}
                         onChange={(event) => onFilterChange('status', event.target.value)}
@@ -184,9 +188,9 @@ function RecipeFilterControls({
                     minWidth: { xs: '100%', md: variant === 'admin' ? 150 : 160 },
                 }}
             >
-                <InputLabel id={`${idPrefix}-sort-filter-label`}>Ordenar</InputLabel>
+                <InputLabel id={`${controlIdPrefix}-sort-filter-label`}>Ordenar</InputLabel>
                 <Select
-                    labelId={`${idPrefix}-sort-filter-label`}
+                    labelId={`${controlIdPrefix}-sort-filter-label`}
                     label="Ordenar"
                     value={filters.sort}
                     onChange={(event) => onFilterChange('sort', event.target.value)}
@@ -217,6 +221,7 @@ function RecipeFilterControls({
                     textTransform: 'uppercase',
                     px: '14px',
                     whiteSpace: 'nowrap',
+                    width: { xs: '100%', md: 'auto' },
                     '&:hover': {
                         borderColor: '#2D2D2D',
                         backgroundColor: 'rgba(45,45,45,0.05)',
@@ -226,6 +231,59 @@ function RecipeFilterControls({
                 Limpar
             </Button>
         </Box>
+    );
+    const content = (
+        <>
+            <Button
+                type="button"
+                variant="outlined"
+                startIcon={<TuneIcon sx={{ fontSize: 18 }} />}
+                endIcon={<ExpandMoreIcon sx={{
+                    fontSize: 19,
+                    transform: mobileFiltersOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                }} />}
+                onClick={() => setMobileFiltersOpen((open) => !open)}
+                aria-expanded={mobileFiltersOpen}
+                aria-controls={`${idPrefix}-mobile-filter-controls`}
+                sx={{
+                    display: { xs: 'inline-flex', md: 'none' },
+                    width: '100%',
+                    height: '40px',
+                    borderRadius: '8px',
+                    borderColor: '#2D2D2D',
+                    color: '#2D2D2D',
+                    fontFamily: FONT_PRIMARY,
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    justifyContent: 'flex-start',
+                    px: '14px',
+                    '& .MuiButton-endIcon': { ml: 'auto' },
+                    '&:hover': {
+                        borderColor: '#2D2D2D',
+                        backgroundColor: 'rgba(45,45,45,0.05)',
+                    },
+                }}
+            >
+                {mobileFiltersOpen ? 'Fechar filtros' : 'Abrir filtros'}
+            </Button>
+
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                {renderControls(`${idPrefix}-desktop`)}
+            </Box>
+
+            <Collapse
+                id={`${idPrefix}-mobile-filter-controls`}
+                in={mobileFiltersOpen}
+                timeout="auto"
+                sx={{ display: { xs: 'block', md: 'none' } }}
+            >
+                <Box sx={{ mt: '12px' }}>
+                    {renderControls(`${idPrefix}-mobile`)}
+                </Box>
+            </Collapse>
+        </>
     );
 
     if (variant === 'admin') {

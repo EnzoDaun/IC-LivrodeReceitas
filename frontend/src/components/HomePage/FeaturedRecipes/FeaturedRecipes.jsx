@@ -93,31 +93,34 @@ const FeaturedRecipes = ({
                 borderRadius: '19px',
                 backgroundColor: 'transparent',
                 boxSizing: 'border-box',
-                p: '20px 16px 16px 16px',
+                p: { xs: '16px 12px 14px', sm: '18px 14px 15px', md: '20px 16px 16px 16px' },
                 position: 'relative',
             }}>
                 <Box sx={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
                     justifyContent: 'space-between',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: '12px', sm: '16px' },
                     mb: '18px',
                 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
                         <StarIcon />
                         <Typography sx={{
                             fontFamily: FONT_PRIMARY,
-                            fontSize: '26px',
+                            fontSize: { xs: '20px', sm: '23px', md: '26px' },
                             fontWeight: 800,
                             color: '#282828',
-                            lineHeight: '30px',
+                            lineHeight: { xs: '24px', sm: '27px', md: '30px' },
                             letterSpacing: '0.2px',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: { xs: 'normal', md: 'nowrap' },
+                            overflowWrap: 'anywhere',
                         }}>
                             {title}
                         </Typography>
                     </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', alignSelf: { xs: 'flex-end', sm: 'center' } }}>
                         <Box
                             onClick={handlePrev}
                             sx={{
@@ -157,8 +160,8 @@ const FeaturedRecipes = ({
                     key={currentIndex}
                     sx={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '10px',
+                        gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+                        gap: { xs: '12px', md: '10px' },
                         '@keyframes carouselFadeIn': {
                             from: { opacity: 0, transform: 'translateY(10px)' },
                             to:   { opacity: 1, transform: 'translateY(0)' },
@@ -167,17 +170,17 @@ const FeaturedRecipes = ({
                     }}
                 >
                     {isLoading && (
-                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
+                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px', gridColumn: '1 / -1' }}>
                             Carregando receitas...
                         </Typography>
                     )}
                     {!isLoading && errorMessage && (
-                        <Typography sx={{ color: '#9F2D20', fontSize: '14px' }}>
+                        <Typography sx={{ color: '#9F2D20', fontSize: '14px', gridColumn: '1 / -1' }}>
                             {errorMessage}
                         </Typography>
                     )}
                     {!isLoading && !errorMessage && (recipes?.length === 0) && (
-                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
+                        <Typography sx={{ color: '#6B6B6B', fontSize: '14px', gridColumn: '1 / -1' }}>
                             Nenhuma receita avaliada ainda.
                         </Typography>
                     )}

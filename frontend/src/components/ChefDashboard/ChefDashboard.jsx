@@ -72,20 +72,20 @@ function StatCard({ label, value, description }) {
     return (
         <Paper elevation={0} sx={{
             flex: 1,
-            borderRadius: '9px',
+            borderRadius: '8px',
             boxShadow: '0px 3px 13px rgba(0,0,0,0.10)',
             backgroundColor: '#FEFEFD',
-            p: '20px 18px',
+            p: { xs: '16px', md: '20px 18px' },
             display: 'flex',
             flexDirection: 'column',
         }}>
-            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '22px', fontWeight: 800, color: '#2A2A2A', lineHeight: '26px' }}>
+            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '18px', md: '22px' }, fontWeight: 800, color: '#2A2A2A', lineHeight: { xs: '22px', md: '26px' } }}>
                 {label}
             </Typography>
-            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '48px', fontWeight: 800, color: COLOR_ORANGE, lineHeight: '58px', mt: '16px' }}>
+            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '36px', md: '48px' }, fontWeight: 800, color: COLOR_ORANGE, lineHeight: { xs: '42px', md: '58px' }, mt: { xs: '10px', md: '16px' } }}>
                 {value}
             </Typography>
-            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '15px', fontWeight: 400, color: '#4A4A4A', lineHeight: '20px', mt: '10px' }}>
+            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '13px', md: '15px' }, fontWeight: 400, color: '#4A4A4A', lineHeight: { xs: '18px', md: '20px' }, mt: '10px' }}>
                 {description}
             </Typography>
         </Paper>
@@ -243,7 +243,7 @@ const ChefDashboard = () => {
 
     return (
         <>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px', mt: '40px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '9px', mt: { xs: '28px', md: '40px' } }}>
                 <Box
                     component="img"
                     src="/assets/icons/chefIcon.png"
@@ -251,16 +251,16 @@ const ChefDashboard = () => {
                     sx={{ width: 44, height: 44, objectFit: 'contain', flexShrink: 0 }}
                 />
                 <Box>
-                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '30px', fontWeight: 800, color: '#080C14', lineHeight: '34px', letterSpacing: '-0.5px' }}>
+                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '24px', md: '30px' }, fontWeight: 800, color: '#080C14', lineHeight: { xs: '28px', md: '34px' } }}>
                         Painel do chef
                     </Typography>
-                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '16px', fontWeight: 400, color: '#222222', lineHeight: '18px' }}>
+                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '14px', md: '16px' }, fontWeight: 400, color: '#222222', lineHeight: { xs: '18px', md: '18px' } }}>
                         {`Bem vindo${profile?.full_name ? `, ${profile.full_name}` : ''}!`}
                     </Typography>
                 </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: '30px', mt: '32px' }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: '14px', md: '30px' }, mt: { xs: '24px', md: '32px' } }}>
                 {stats.map((s) => (
                     <StatCard key={s.label} {...s} />
                 ))}
@@ -269,20 +269,22 @@ const ChefDashboard = () => {
             <Paper elevation={0} sx={{
                 mt: '28px',
                 width: '100%',
-                height: '84px',
-                borderRadius: '9px',
+                minHeight: { xs: 'auto', md: '84px' },
+                borderRadius: '8px',
                 boxShadow: '0px 3px 13px rgba(0,0,0,0.08)',
                 backgroundColor: '#FEFEFD',
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: { xs: 'stretch', sm: 'center' },
                 justifyContent: 'space-between',
-                px: '18px',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: '14px', sm: '16px' },
+                p: { xs: '16px', md: '0 18px' },
                 boxSizing: 'border-box',
             }}>
-                <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '24px', fontWeight: 800, color: '#2A2A2A', lineHeight: '30px' }}>
+                <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: { xs: '20px', md: '24px' }, fontWeight: 800, color: '#2A2A2A', lineHeight: { xs: '24px', md: '30px' } }}>
                     Receitas cadastradas
                 </Typography>
-                <Button disableElevation disableRipple onClick={goToAddRecipe} sx={{ ...orangeBtn, width: '168px', height: '42px' }}>
+                <Button disableElevation disableRipple onClick={goToAddRecipe} sx={{ ...orangeBtn, width: { xs: '100%', sm: '168px' }, height: '42px' }}>
                     + Adicionar Nova Receita
                 </Button>
             </Paper>
@@ -326,7 +328,7 @@ const ChefDashboard = () => {
                         <br />
                         algumas receitas!
                     </Typography>
-                    <Button disableElevation disableRipple onClick={goToAddRecipe} sx={{ ...orangeBtn, width: '174px', height: '42px', mt: '24px' }}>
+                    <Button disableElevation disableRipple onClick={goToAddRecipe} sx={{ ...orangeBtn, width: { xs: '100%', sm: '174px' }, maxWidth: '220px', height: '42px', mt: '24px' }}>
                         + Adicionar Nova Receita
                     </Button>
                 </Box>
@@ -339,14 +341,14 @@ const ChefDashboard = () => {
                     </Typography>
                 ) : (
                     <>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: '18px', mt: '28px' }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: { xs: '14px', md: '18px' }, mt: { xs: '22px', md: '28px' } }}>
                             {paginatedRecipes.map((recipe) => (
-                                <Paper key={recipe.id} elevation={0} sx={{ borderRadius: '12px', p: '18px', boxShadow: '0px 3px 13px rgba(0,0,0,0.08)' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '18px', fontWeight: 800, color: '#2A2A2A' }}>
+                                <Paper key={recipe.id} elevation={0} sx={{ borderRadius: '8px', p: { xs: '16px', md: '18px' }, boxShadow: '0px 3px 13px rgba(0,0,0,0.08)' }}>
+                                    <Box sx={{ display: 'flex', alignItems: { xs: 'stretch', sm: 'flex-start' }, justifyContent: 'space-between', gap: '12px', flexDirection: { xs: 'column', sm: 'row' } }}>
+                                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '18px', fontWeight: 800, color: '#2A2A2A', overflowWrap: 'anywhere' }}>
                                             {recipe.title}
                                         </Typography>
-                                        <Box sx={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                                        <Box sx={{ display: 'flex', gap: '8px', flexShrink: 0, width: { xs: '100%', sm: 'auto' } }}>
                                             <Button
                                                 disableElevation
                                                 onClick={() => goToEditRecipe(recipe.id)}
@@ -356,6 +358,7 @@ const ChefDashboard = () => {
                                                     height: '32px',
                                                     color: COLOR_ORANGE,
                                                     border: `1px solid ${COLOR_ORANGE}`,
+                                                    width: { xs: '50%', sm: 'auto' },
                                                 }}
                                             >
                                                 Editar
@@ -371,6 +374,7 @@ const ChefDashboard = () => {
                                                     border: '1px solid #F0A8A0',
                                                     backgroundColor: '#FFF7F5',
                                                     '&:hover': { backgroundColor: '#FFEDEA' },
+                                                    width: { xs: '50%', sm: 'auto' },
                                                 }}
                                             >
                                                 Excluir
@@ -380,7 +384,7 @@ const ChefDashboard = () => {
                                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#4A4A4A', mt: '8px' }}>
                                         {recipe.description || 'Sem descricao cadastrada.'}
                                     </Typography>
-                                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 700, color: COLOR_ORANGE, mt: '12px', textTransform: 'uppercase' }}>
+                                    <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 700, color: COLOR_ORANGE, mt: '12px', textTransform: 'uppercase', overflowWrap: 'anywhere' }}>
                                         {`${recipe.category || 'Sem categoria'} · ${recipe.difficulty || 'Sem nivel'} · ${recipe.prep_time_minutes || 0} min`}
                                     </Typography>
                                 </Paper>
