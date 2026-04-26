@@ -13,6 +13,7 @@ import { mapRecipeToCard } from '@/lib/supabase/recipeMappers';
 import {
     listFavoriteRecipeIds,
     listPublishedRecipes,
+    listTopRatedPublishedRecipes,
     toggleFavoriteRecipe,
 } from '@/services/supabase/recipeService';
 
@@ -20,7 +21,8 @@ const HomePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, user } = useAuth();
-    const [recipes, setRecipes] = useState([]);
+    const [featuredRecipes, setFeaturedRecipes] = useState([]);
+    const [journeyRecipes, setJourneyRecipes] = useState([]);
     const [isLoadingRecipes, setIsLoadingRecipes] = useState(true);
     const [recipesError, setRecipesError] = useState('');
 
@@ -54,19 +56,21 @@ const HomePage = () => {
                 setIsLoadingRecipes(true);
                 setRecipesError('');
 
-                const [publishedRecipes, userFavoriteIds] = await Promise.all([
-                    listPublishedRecipes({ limit: 9 }),
+                const [topRated, allPublished, userFavoriteIds] = await Promise.all([
+                    listTopRatedPublishedRecipes({ limit: 6 }),
+                    listPublishedRecipes(),
                     isAuthenticated ? listFavoriteRecipeIds(user.id) : Promise.resolve(new Set()),
                 ]);
 
                 if (!isMounted) return;
 
-                setRecipes(
-                    publishedRecipes.map((recipe) => mapRecipeToCard({
-                        ...recipe,
-                        is_favorite: userFavoriteIds.has(recipe.id),
-                    }))
-                );
+                const toCard = (recipe) => mapRecipeToCard({
+                    ...recipe,
+                    is_favorite: userFavoriteIds.has(recipe.id),
+                });
+
+                setFeaturedRecipes(topRated.map(toCard));
+                setJourneyRecipes(allPublished.map(toCard));
             } catch (error) {
                 if (isMounted) {
                     setRecipesError(error.message || 'Nao foi possivel carregar as receitas.');
@@ -85,17 +89,20 @@ const HomePage = () => {
         };
     }, [isAuthenticated, user?.id]);
 
+    const toggleInList = (setter) => (recipeId, shouldFavorite) => {
+        setter((current) => current.map((r) => (
+            r.id === recipeId ? { ...r, isFavorite: shouldFavorite } : r
+        )));
+    };
+
     const handleToggleFavorite = async (recipeId, shouldFavorite) => {
         if (!isAuthenticated) {
             navigate('/login');
             return;
         }
 
-        setRecipes((currentRecipes) => currentRecipes.map((recipe) => (
-            recipe.id === recipeId
-                ? { ...recipe, isFavorite: shouldFavorite }
-                : recipe
-        )));
+        toggleInList(setFeaturedRecipes)(recipeId, shouldFavorite);
+        toggleInList(setJourneyRecipes)(recipeId, shouldFavorite);
 
         try {
             await toggleFavoriteRecipe({
@@ -131,7 +138,7 @@ const HomePage = () => {
 
             <Box id="receitas">
                 <FeaturedRecipes
-                    recipes={recipes}
+                    recipes={featuredRecipes}
                     isLoading={isLoadingRecipes}
                     errorMessage={recipesError}
                     onViewRecipe={handleViewRecipe}
@@ -145,7 +152,7 @@ const HomePage = () => {
             )}
             <Box id="mais-vistas">
                 <Journey
-                    recipes={recipes}
+                    recipes={journeyRecipes}
                     isLoading={isLoadingRecipes}
                     errorMessage={recipesError}
                     onViewRecipe={handleViewRecipe}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
     Box, Button, Dialog, DialogActions, DialogContent,
@@ -9,6 +9,7 @@ import { primaryNavigationLinks } from '@/config/navigation';
 import { FONT_PRIMARY } from '@/config/constants/styles';
 import { useAuth } from '@/hooks/useAuth';
 import { VALIDATION_LIMITS, normalizeSpaces } from '@/utils/validation';
+import { searchPublishedRecipes } from '@/services/supabase/recipeService';
 
 const SearchIcon = () => (
     <Box
@@ -28,11 +29,52 @@ const SearchIcon = () => (
 
 const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = true }) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
     const [activeLink, setActiveLink] = useState(initialActiveLink);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+    const searchRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
     const { isAuthenticated, signOut } = useAuth();
+
+    // ── busca ao vivo com debounce ────────────────────────────────────────
+    useEffect(() => {
+        const trimmed = normalizeSpaces(searchQuery);
+        if (trimmed.length < 2) {
+            setSearchResults([]);
+            setShowDropdown(false);
+            return;
+        }
+
+        setIsSearching(true);
+        setShowDropdown(true);
+
+        const timer = setTimeout(async () => {
+            try {
+                const results = await searchPublishedRecipes(trimmed);
+                setSearchResults(results);
+            } catch {
+                setSearchResults([]);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // ── fechar dropdown ao clicar fora ────────────────────────────────────
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (searchRef.current && !searchRef.current.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const navigationLinks = (links && links.length > 0) ? links : primaryNavigationLinks;
 
@@ -168,33 +210,103 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
 
                     {/* ── BUSCA ── */}
                     {showSearch && (
-                        <Box
-                            component="form"
-                            onSubmit={handleSearchSubmit}
-                            sx={{
-                                width: '190px', height: '28px',
-                                border: '1px solid #F06A57', borderRadius: '999px',
-                                backgroundColor: 'transparent',
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                pl: '14px', pr: '10px', boxSizing: 'border-box', flexShrink: 0,
-                            }}
-                        >
-                            <InputBase
-                                placeholder="Pesquisar receitas..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value.slice(0, VALIDATION_LIMITS.searchMax))}
-                                inputProps={{ 'aria-label': 'Pesquisar receitas', maxLength: VALIDATION_LIMITS.searchMax }}
+                        <Box ref={searchRef} sx={{ position: 'relative', flexShrink: 0 }}>
+                            <Box
+                                component="form"
+                                onSubmit={handleSearchSubmit}
                                 sx={{
-                                    flex: 1, fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 400, fontStyle: 'italic', color: '#F06A57',
-                                    '& input': {
-                                        p: 0, fontFamily: FONT_PRIMARY, fontSize: '12px', fontStyle: 'italic', color: '#F06A57',
-                                        '&::placeholder': { color: '#F06A57', opacity: 1 },
-                                    },
+                                    width: '190px', height: '28px',
+                                    border: '1px solid #F06A57', borderRadius: '999px',
+                                    backgroundColor: 'transparent',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    pl: '14px', pr: '10px', boxSizing: 'border-box',
                                 }}
-                            />
-                            <ButtonBase type="submit" disableRipple sx={{ p: 0, ml: '6px', display: 'flex', alignItems: 'center' }}>
-                                <SearchIcon />
-                            </ButtonBase>
+                            >
+                                <InputBase
+                                    placeholder="Pesquisar receitas..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value.slice(0, VALIDATION_LIMITS.searchMax))}
+                                    inputProps={{ 'aria-label': 'Pesquisar receitas', maxLength: VALIDATION_LIMITS.searchMax }}
+                                    sx={{
+                                        flex: 1, fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 400, fontStyle: 'italic', color: '#F06A57',
+                                        '& input': {
+                                            p: 0, fontFamily: FONT_PRIMARY, fontSize: '12px', fontStyle: 'italic', color: '#F06A57',
+                                            '&::placeholder': { color: '#F06A57', opacity: 1 },
+                                        },
+                                    }}
+                                />
+                                <ButtonBase type="submit" disableRipple sx={{ p: 0, ml: '6px', display: 'flex', alignItems: 'center' }}>
+                                    <SearchIcon />
+                                </ButtonBase>
+                            </Box>
+
+                            {/* ── DROPDOWN DE RESULTADOS ── */}
+                            {showDropdown && (
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 6px)',
+                                    right: 0,
+                                    width: '300px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
+                                    border: '1px solid #E8E2DB',
+                                    overflow: 'hidden',
+                                    zIndex: 1300,
+                                }}>
+                                    {isSearching && (
+                                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#9A958D', p: '14px' }}>
+                                            Buscando...
+                                        </Typography>
+                                    )}
+                                    {!isSearching && searchResults.length === 0 && (
+                                        <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#9A958D', p: '14px' }}>
+                                            Nenhuma receita encontrada.
+                                        </Typography>
+                                    )}
+                                    {!isSearching && searchResults.map((result, index) => (
+                                        <Box
+                                            key={result.id}
+                                            onClick={() => {
+                                                navigate(`/receitas/${result.id}`);
+                                                setShowDropdown(false);
+                                                setSearchQuery('');
+                                            }}
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '12px',
+                                                px: '12px',
+                                                py: '10px',
+                                                cursor: 'pointer',
+                                                borderBottom: index < searchResults.length - 1 ? '1px solid #F0EBE3' : 'none',
+                                                transition: 'background-color 0.15s',
+                                                '&:hover': { backgroundColor: '#FAF7F3' },
+                                            }}
+                                        >
+                                            <Box
+                                                component="img"
+                                                src={result.imageUrl}
+                                                alt={result.title}
+                                                sx={{ width: 42, height: 42, borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}
+                                            />
+                                            <Typography sx={{
+                                                fontFamily: FONT_PRIMARY,
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                color: '#2D2D2D',
+                                                lineHeight: 1.3,
+                                                overflow: 'hidden',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                            }}>
+                                                {result.title}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </Box>

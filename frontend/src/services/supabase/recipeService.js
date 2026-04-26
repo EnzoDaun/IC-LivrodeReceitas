@@ -21,6 +21,7 @@ const RECIPE_SELECT = `
     prep_time_minutes,
     portions,
     average_rating,
+    rating_count,
     is_published,
     created_at,
     recipe_images (
@@ -293,6 +294,39 @@ function sortRecipeCollections(recipe) {
     };
 }
 
+export async function searchPublishedRecipes(query, { limit = 8 } = {}) {
+    const client = requireSupabase();
+    const { data, error } = await client
+        .from('recipes')
+        .select(`
+            id,
+            title,
+            recipe_images (
+                public_url,
+                is_cover,
+                sort_order
+            )
+        `)
+        .eq('is_published', true)
+        .ilike('title', `%${query}%`)
+        .order('title', { ascending: true })
+        .limit(limit);
+
+    if (error) throw error;
+
+    const DEFAULT_IMAGE = '/assets/recipes/RecipeImage.png';
+
+    return (data || []).map((recipe) => {
+        const images = [...(recipe.recipe_images || [])].sort((a, b) => a.sort_order - b.sort_order);
+        const cover = images.find((img) => img.is_cover) || images[0];
+        return {
+            id: recipe.id,
+            title: recipe.title,
+            imageUrl: cover?.public_url || DEFAULT_IMAGE,
+        };
+    });
+}
+
 export async function listPublishedRecipes({ limit } = {}) {
     const client = requireSupabase();
     let query = client
@@ -310,6 +344,26 @@ export async function listPublishedRecipes({ limit } = {}) {
     if (error) throw error;
 
     return (data || []).map(sortRecipeCollections);
+}
+
+export async function listTopRatedPublishedRecipes({ limit = 6 } = {}) {
+    const client = requireSupabase();
+    const { data, error } = await client
+        .from('recipes')
+        .select(RECIPE_SELECT)
+        .eq('is_published', true);
+
+    if (error) throw error;
+
+    return (data || [])
+        .map(sortRecipeCollections)
+        .filter((r) => (r.rating_count || 0) > 0)
+        .sort((a, b) => {
+            const scoreA = (a.average_rating || 0) * (a.rating_count || 0);
+            const scoreB = (b.average_rating || 0) * (b.rating_count || 0);
+            return scoreB - scoreA;
+        })
+        .slice(0, limit);
 }
 
 export async function listRecipesByAuthor(authorId) {

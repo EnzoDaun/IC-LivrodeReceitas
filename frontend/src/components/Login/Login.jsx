@@ -78,7 +78,11 @@ const Login = () => {
     useEffect(() => {
         if (isAuthenticated) {
             const redirectTo = location.state?.from?.pathname || '/receitas';
-            navigate(redirectTo, { replace: true });
+            const pendingRating = location.state?.pendingRating;
+            navigate(redirectTo, {
+                replace: true,
+                ...(pendingRating ? { state: { pendingRating } } : {}),
+            });
         }
     }, [isAuthenticated, location.state, navigate]);
 
@@ -123,7 +127,12 @@ const Login = () => {
 
             if (mode === 'login') {
                 await signIn({ email: normalizedEmail, password });
-                navigate('/receitas', { replace: true });
+                const redirectTo = location.state?.from?.pathname || '/receitas';
+                const pendingRating = location.state?.pendingRating;
+                navigate(redirectTo, {
+                    replace: true,
+                    ...(pendingRating ? { state: { pendingRating } } : {}),
+                });
                 return;
             }
 

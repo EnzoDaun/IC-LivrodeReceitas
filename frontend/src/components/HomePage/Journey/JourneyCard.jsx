@@ -37,9 +37,26 @@ export default function JourneyCard({ recipe, onView }) {
                         <Typography sx={{ fontSize: '11px', fontWeight: 800, color: '#262522', letterSpacing: '0.3px', textTransform: 'uppercase' }}>
                             {`${recipe.time} · ${recipe.difficulty} · ${recipe.portions}`}
                         </Typography>
-                        <Typography sx={{ fontSize: '18px', color: '#FFD233', letterSpacing: '0px', lineHeight: 1 }}>
-                            ★★★★★
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                                <Box
+                                    key={i}
+                                    component="span"
+                                    sx={{
+                                        fontSize: '16px',
+                                        lineHeight: 1,
+                                        color: i < Math.round(recipe.rating || 0) ? '#FFD233' : '#D4CEC7',
+                                    }}
+                                >
+                                    ★
+                                </Box>
+                            ))}
+                            {(recipe.ratingCount > 0) && (
+                                <Box component="span" sx={{ fontSize: '11px', color: '#9A958D', ml: '3px', lineHeight: 1 }}>
+                                    ({recipe.ratingCount})
+                                </Box>
+                            )}
+                        </Box>
                     </Stack>
 
                     <Button

@@ -85,16 +85,26 @@ const RecipeCard = ({ recipe, onView, onToggleFavorite }) => {
                     justifyContent: 'space-between',
                     mt: '12px',
                 }}>
-                    <Typography sx={{
-                        fontFamily: FONT_PRIMARY,
-                        fontSize: '17px',
-                        fontWeight: 700,
-                        color: '#FFC928',
-                        letterSpacing: '0px',
-                        lineHeight: 1,
-                    }}>
-                        ★★★★★
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+                        {Array.from({ length: 5 }, (_, i) => (
+                            <Box
+                                key={i}
+                                component="span"
+                                sx={{
+                                    fontSize: '15px',
+                                    lineHeight: 1,
+                                    color: i < Math.round(recipe.rating || 0) ? '#FFC928' : '#D4CEC7',
+                                }}
+                            >
+                                ★
+                            </Box>
+                        ))}
+                        {(recipe.ratingCount > 0) && (
+                            <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', color: '#9A958D', ml: '3px', lineHeight: 1 }}>
+                                ({recipe.ratingCount})
+                            </Typography>
+                        )}
+                    </Box>
 
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
@@ -150,6 +160,7 @@ RecipeCard.propTypes = {
         excerpt: PropTypes.string,
         imageUrl: PropTypes.string,
         rating: PropTypes.number,
+        ratingCount: PropTypes.number,
         time: PropTypes.string,
         difficulty: PropTypes.string,
         portions: PropTypes.string,

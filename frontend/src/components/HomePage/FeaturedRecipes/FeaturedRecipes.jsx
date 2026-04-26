@@ -176,9 +176,9 @@ const FeaturedRecipes = ({
                             {errorMessage}
                         </Typography>
                     )}
-                    {!isLoading && !errorMessage && displayed.length === 0 && (
+                    {!isLoading && !errorMessage && (recipes?.length === 0) && (
                         <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
-                            Nenhuma receita publicada ainda.
+                            Nenhuma receita avaliada ainda.
                         </Typography>
                     )}
                     {displayed.map((recipe) => (
