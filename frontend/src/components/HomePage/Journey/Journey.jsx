@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react';
-import { Box, Typography, Button, Stack, Chip } from '@mui/material';
-import { journeyFilters } from '@/config/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Button, Stack, Chip, Menu, MenuItem } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { listRecipeCategories } from '@/services/supabase/recipeService';
 import JourneyCard from './JourneyCard';
+
+const maxVisibleCategoryFilters = 6;
 
 function normalizeFilter(value) {
     return (value || '')
@@ -17,6 +20,54 @@ export default function Journey({
     onViewRecipe,
 }) {
     const [activeFilter, setActiveFilter] = useState('TODAS');
+    const [categories, setCategories] = useState([]);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+    const [categoriesError, setCategoriesError] = useState('');
+    const [categoryMenuAnchor, setCategoryMenuAnchor] = useState(null);
+    const categoryFilters = useMemo(() => ([
+        { label: 'TODAS', value: 'TODAS' },
+        ...categories.map((category) => ({
+            label: category.name,
+            value: normalizeFilter(category.name),
+        })),
+    ]), [categories]);
+    const visibleFilters = categoryFilters.slice(0, maxVisibleCategoryFilters);
+    const overflowFilters = categoryFilters.slice(maxVisibleCategoryFilters);
+    const overflowActiveFilter = overflowFilters.find((filter) => filter.value === activeFilter);
+    const displayedVisibleFilters = overflowActiveFilter
+        ? [...visibleFilters.slice(0, -1), overflowActiveFilter]
+        : visibleFilters;
+    const isMenuOpen = Boolean(categoryMenuAnchor);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        async function loadCategories() {
+            try {
+                setIsLoadingCategories(true);
+                setCategoriesError('');
+                const nextCategories = await listRecipeCategories();
+
+                if (isMounted) {
+                    setCategories(nextCategories);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setCategoriesError(error.message || 'Nao foi possivel carregar as categorias.');
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoadingCategories(false);
+                }
+            }
+        }
+
+        loadCategories();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const displayedRecipes = useMemo(() => {
         if (activeFilter === 'TODAS') return recipes;
@@ -25,6 +76,11 @@ export default function Journey({
             normalizeFilter(recipe.category) === activeFilter
         ));
     }, [activeFilter, recipes]);
+
+    const handleSelectFilter = (filterValue) => {
+        setActiveFilter(filterValue);
+        setCategoryMenuAnchor(null);
+    };
 
     return (
         <Box sx={{ width: '100%', bgcolor: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'stretch', pt: '51px', pb: '36px' }}>
@@ -56,13 +112,13 @@ export default function Journey({
                 </Typography>
             </Stack>
 
-            <Stack direction="row" alignItems="center" justifyContent="center" gap="10px" sx={{ mt: '28px', flexWrap: 'wrap', width: '100%' }}>
-                {journeyFilters.map((filter) => {
-                    const isActive = activeFilter === filter;
+            <Stack direction="row" alignItems="center" justifyContent="center" gap="10px" sx={{ mt: '28px', flexWrap: 'wrap', width: '100%', maxWidth: 850, mx: 'auto' }}>
+                {displayedVisibleFilters.map((filter) => {
+                    const isActive = activeFilter === filter.value;
                     return (
                         <Button
-                            key={filter}
-                            onClick={() => setActiveFilter(filter)}
+                            key={filter.value}
+                            onClick={() => handleSelectFilter(filter.value)}
                             disableElevation
                             disableRipple
                             sx={{
@@ -81,11 +137,73 @@ export default function Journey({
                                 '&:hover': { bgcolor: isActive ? '#8fcc16' : 'rgba(0,0,0,0.04)' },
                             }}
                         >
-                            {filter}
+                            {filter.label}
                         </Button>
                     );
                 })}
+                {overflowFilters.length > 0 && (
+                    <>
+                        <Button
+                            onClick={(event) => setCategoryMenuAnchor(event.currentTarget)}
+                            endIcon={<KeyboardArrowDownIcon fontSize="small" />}
+                            disableElevation
+                            disableRipple
+                            sx={{
+                                height: 36,
+                                borderRadius: '999px',
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.3px',
+                                px: '18px',
+                                minWidth: 'unset',
+                                whiteSpace: 'nowrap',
+                                bgcolor: isMenuOpen ? 'rgba(0,0,0,0.04)' : 'transparent',
+                                border: '1px solid #C9C6BE',
+                                color: '#9A9892',
+                                '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' },
+                            }}
+                        >
+                            Mais
+                        </Button>
+                        <Menu
+                            anchorEl={categoryMenuAnchor}
+                            open={isMenuOpen}
+                            onClose={() => setCategoryMenuAnchor(null)}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        maxHeight: 280,
+                                        mt: 1,
+                                        borderRadius: '8px',
+                                    },
+                                },
+                            }}
+                        >
+                            {overflowFilters.map((filter) => (
+                                <MenuItem
+                                    key={filter.value}
+                                    selected={activeFilter === filter.value}
+                                    onClick={() => handleSelectFilter(filter.value)}
+                                    sx={{ fontSize: '13px', textTransform: 'uppercase' }}
+                                >
+                                    {filter.label}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </>
+                )}
             </Stack>
+            {isLoadingCategories && (
+                <Typography sx={{ mt: '10px', color: '#777570', fontSize: '12px', textAlign: 'center' }}>
+                    Carregando categorias...
+                </Typography>
+            )}
+            {categoriesError && (
+                <Typography sx={{ mt: '10px', color: '#9F2D20', fontSize: '12px', textAlign: 'center' }}>
+                    {categoriesError}
+                </Typography>
+            )}
 
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: '20px 16px', mt: '32px', width: '100%' }}>
                 {isLoading && (
