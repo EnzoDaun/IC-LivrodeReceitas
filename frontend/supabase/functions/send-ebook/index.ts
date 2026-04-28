@@ -83,7 +83,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (req.method !== 'POST') {
-        return jsonResponse({ error: 'Metodo nao permitido.' }, 405);
+        return jsonResponse({ error: 'Método não permitido.' }, 405);
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
     if (!supabaseUrl || !serviceRoleKey) {
-        return jsonResponse({ error: 'Supabase nao esta configurado para a funcao.' }, 500);
+        return jsonResponse({ error: 'Supabase não está configurado para a função.' }, 500);
     }
 
     let payload: Record<string, unknown>;
@@ -99,7 +99,7 @@ Deno.serve(async (req: Request) => {
     try {
         payload = await req.json();
     } catch (_error) {
-        return jsonResponse({ error: 'JSON invalido.' }, 400);
+        return jsonResponse({ error: 'JSON inválido.' }, 400);
     }
 
     const email = normalizeEmail(payload.email);
@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!ebookUrl) {
-        const message = 'Configure EBOOK_PUBLIC_URL ou envie ebookUrl no corpo da requisicao.';
+        const message = 'Configure EBOOK_PUBLIC_URL ou envie ebookUrl no corpo da requisição.';
         await adminClient
             .from('ebook_leads')
             .update({
@@ -158,15 +158,15 @@ Deno.serve(async (req: Request) => {
         return jsonResponse({ error: message, leadId: lead.id }, 500);
     }
 
-    const fromEmail = Deno.env.get('EBOOK_FROM_EMAIL') || 'Livro de Receitas <onboarding@resend.dev>';
+    const fromEmail = Deno.env.get('EBOOK_FROM_EMAIL') || 'Receitas Fantásticas <onboarding@resend.dev>';
     const attachment = await loadAttachment(ebookUrl);
     const emailBody: Record<string, unknown> = {
         from: fromEmail,
         to: [email],
-        subject: 'Seu e-book do Livro de Receitas',
+        subject: 'Seu e-book de Receitas Fantásticas',
         html: `
             <p>Olá!</p>
-            <p>Segue o e-book solicitado no Livro de Receitas.</p>
+            <p>Segue o e-book solicitado em Receitas Fantásticas.</p>
             <p><a href="${ebookUrl}">Clique aqui para acessar o e-book</a>.</p>
         `,
     };
@@ -186,7 +186,7 @@ Deno.serve(async (req: Request) => {
     const resendData = await resendResponse.json().catch(() => ({}));
 
     if (!resendResponse.ok) {
-        const message = String(resendData.message || resendData.error || 'Nao foi possivel enviar o e-mail.');
+        const message = String(resendData.message || resendData.error || 'Não foi possível enviar o e-mail.');
         await adminClient
             .from('ebook_leads')
             .update({

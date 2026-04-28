@@ -57,7 +57,7 @@ const DialogReceberEbook = ({ open, onClose }) => {
             setEmail(normalizedEmail);
             setSent(true);
         } catch (error) {
-            setEmailError(error.message || 'Nao foi possivel enviar o e-book.');
+            setEmailError(error.message || 'Não foi possível enviar o e-book.');
         } finally {
             setIsSubmitting(false);
         }
@@ -154,7 +154,7 @@ const DialogReceberEbook = ({ open, onClose }) => {
                                     },
                                 }}
                             >
-                                Usar email da conta: {accountEmail}
+                                Usar e-mail da conta: {accountEmail}
                             </Button>
                         )}
                     </Box>

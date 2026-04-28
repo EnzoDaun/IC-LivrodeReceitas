@@ -135,7 +135,7 @@ const RecipeDetailPage = () => {
                 const data = await getRecipeById(recipeId);
                 if (isMounted) setRecipe(mapRecipeToDetail(data));
             } catch (error) {
-                if (isMounted) setErrorMessage(error.message || 'Nao foi possivel carregar a receita.');
+                if (isMounted) setErrorMessage(error.message || 'Não foi possível carregar a receita.');
             } finally {
                 if (isMounted) setIsLoading(false);
             }
@@ -218,7 +218,7 @@ const RecipeDetailPage = () => {
                 setTimeout(() => setRatingDialogOpen(false), 1200);
             }
         } catch (error) {
-            setRatingError(error.message || 'Nao foi possivel enviar a avaliacao.');
+            setRatingError(error.message || 'Não foi possível enviar a avaliação.');
         } finally {
             setIsSubmittingRating(false);
         }
@@ -336,7 +336,7 @@ const RecipeDetailPage = () => {
                             </Typography>
                             <Stack gap="14px">
                                 {recipe.steps.length === 0 && (
-                                    <Typography sx={{ color: '#666666' }}>Nenhuma instrucao cadastrada.</Typography>
+                                    <Typography sx={{ color: '#666666' }}>Nenhuma instrução cadastrada.</Typography>
                                 )}
                                 {recipe.steps.map((step, index) => {
                                     const completed = index < currentStep;

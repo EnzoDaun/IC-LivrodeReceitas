@@ -1,1 +1,1 @@
-Sistema/site feito para uma iniciação cientifica com enfase em aproveitamento integral dos alimentos
+Sistema/site feito para uma iniciação científica com ênfase em aproveitamento integral dos alimentos

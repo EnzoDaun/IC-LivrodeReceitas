@@ -51,7 +51,7 @@ const LoginPage = () => {
             <Box
                 component="img"
                 src="/assets/icons/logo.png"
-                alt="Livro de receitas"
+                alt="Receitas Fantásticas"
                 sx={{
                     position: 'absolute',
                     right: { xs: 16, md: 24 },

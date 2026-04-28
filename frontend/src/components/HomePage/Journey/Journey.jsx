@@ -57,7 +57,7 @@ export default function Journey({
                 }
             } catch (error) {
                 if (isMounted) {
-                    setCategoriesError(error.message || 'Nao foi possivel carregar as categorias.');
+                    setCategoriesError(error.message || 'Não foi possível carregar as categorias.');
                 }
             } finally {
                 if (isMounted) {
@@ -126,7 +126,7 @@ export default function Journey({
                     UMA JORNADA
                 </Typography>
                 <Typography sx={{ fontSize: '14px', fontWeight: 400, color: '#777570', mt: '10px' }}>
-                    Descubra nossa colecao de receitas publicadas
+                    Descubra nossa coleção de receitas publicadas
                 </Typography>
             </Stack>
 

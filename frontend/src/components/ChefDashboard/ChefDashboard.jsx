@@ -32,8 +32,8 @@ import { normalizeSpaces } from '@/utils/validation';
 
 const defaultStats = [
     { label: 'Total de receitas', value: '0', description: 'Receitas publicadas' },
-    { label: 'Media de avaliacoes', value: '0.0', description: 'De 5 estrelas' },
-    { label: 'Reviews totais', value: '0', description: 'Reservado para proximas iteracoes' },
+    { label: 'Média de avaliações', value: '0.0', description: 'De 5 estrelas' },
+    { label: 'Reviews totais', value: '0', description: 'Reservado para próximas iterações' },
 ];
 
 const orangeBtn = {
@@ -127,7 +127,7 @@ const ChefDashboard = () => {
             setStats(mapDashboardStats(nextRecipes));
             setRecipeToDelete(null);
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel excluir a receita.');
+            setErrorMessage(error.message || 'Não foi possível excluir a receita.');
         } finally {
             setIsDeleting(false);
         }
@@ -155,7 +155,7 @@ const ChefDashboard = () => {
                 setStats(mapDashboardStats(nextRecipes));
             } catch (error) {
                 if (isMounted) {
-                    setErrorMessage(error.message || 'Nao foi possivel carregar o painel.');
+                    setErrorMessage(error.message || 'Não foi possível carregar o painel.');
                 }
             } finally {
                 if (isMounted) {
@@ -321,10 +321,10 @@ const ChefDashboard = () => {
                         sx={{ width: 70, height: 69, objectFit: 'contain', mb: '16px' }}
                     />
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '24px', fontWeight: 800, color: '#242424', lineHeight: '30px', textAlign: 'center' }}>
-                        Voce ainda nao adicionou receitas
+                        Você ainda não adicionou receitas
                     </Typography>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '15px', fontWeight: 400, color: '#4A4A4A', lineHeight: '17px', textAlign: 'center', mt: '6px' }}>
-                        Vamos comecar adicionando
+                        Vamos começar adicionando
                         <br />
                         algumas receitas!
                     </Typography>
@@ -382,10 +382,10 @@ const ChefDashboard = () => {
                                         </Box>
                                     </Box>
                                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', color: '#4A4A4A', mt: '8px' }}>
-                                        {recipe.description || 'Sem descricao cadastrada.'}
+                                        {recipe.description || 'Sem descrição cadastrada.'}
                                     </Typography>
                                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 700, color: COLOR_ORANGE, mt: '12px', textTransform: 'uppercase', overflowWrap: 'anywhere' }}>
-                                        {`${recipe.category || 'Sem categoria'} · ${recipe.difficulty || 'Sem nivel'} · ${recipe.prep_time_minutes || 0} min`}
+                                        {`${recipe.category || 'Sem categoria'} · ${recipe.difficulty || 'Sem nível'} · ${recipe.prep_time_minutes || 0} min`}
                                     </Typography>
                                 </Paper>
                             ))}
@@ -414,7 +414,7 @@ const ChefDashboard = () => {
                 </DialogTitle>
                 <DialogContent>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', color: '#333333' }}>
-                        {`Tem certeza que deseja excluir "${recipeToDelete?.title || 'esta receita'}"? Essa acao nao pode ser desfeita.`}
+                        {`Tem certeza que deseja excluir "${recipeToDelete?.title || 'esta receita'}"? Essa ação não pode ser desfeita.`}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

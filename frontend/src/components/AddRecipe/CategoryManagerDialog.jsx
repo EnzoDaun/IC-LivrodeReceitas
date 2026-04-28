@@ -121,7 +121,7 @@ const CategoryManagerDialog = ({
         }
 
         if (hasCategoryName(categories, categoryName)) {
-            const duplicateMessage = 'Essa categoria ja existe.';
+            const duplicateMessage = 'Essa categoria já existe.';
             setNewCategoryError(duplicateMessage);
             setErrorMessage(duplicateMessage);
             return;
@@ -135,7 +135,7 @@ const CategoryManagerDialog = ({
             setNewCategoryName('');
             setSuccessMessage('Categoria criada.');
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel criar a categoria.');
+            setErrorMessage(error.message || 'Não foi possível criar a categoria.');
         } finally {
             setBusyAction('');
         }
@@ -164,7 +164,7 @@ const CategoryManagerDialog = ({
         }
 
         if (hasCategoryName(categories, categoryName, category.id)) {
-            const duplicateMessage = 'Essa categoria ja existe.';
+            const duplicateMessage = 'Essa categoria já existe.';
             setEditingCategoryError(duplicateMessage);
             setErrorMessage(duplicateMessage);
             return;
@@ -194,7 +194,7 @@ const CategoryManagerDialog = ({
             setEditingCategoryError('');
             setSuccessMessage('Categoria atualizada.');
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel atualizar a categoria.');
+            setErrorMessage(error.message || 'Não foi possível atualizar a categoria.');
         } finally {
             setBusyAction('');
         }
@@ -221,9 +221,9 @@ const CategoryManagerDialog = ({
             setEditingCategoryId(null);
             setEditingCategoryName('');
             setEditingCategoryError('');
-            setSuccessMessage('Categoria excluida.');
+            setSuccessMessage('Categoria excluída.');
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel excluir a categoria.');
+            setErrorMessage(error.message || 'Não foi possível excluir a categoria.');
         } finally {
             setBusyAction('');
         }
@@ -375,7 +375,7 @@ const CategoryManagerDialog = ({
                                                             <CheckIcon fontSize="small" />
                                                         </IconButton>
                                                     </Tooltip>
-                                                    <Tooltip title="Cancelar edicao">
+                                                    <Tooltip title="Cancelar edição">
                                                         <IconButton
                                                             onClick={() => {
                                                                 setEditingCategoryId(null);
@@ -419,7 +419,7 @@ const CategoryManagerDialog = ({
                                         {isDeleteCandidate && (
                                             <Box sx={{ mt: '10px', p: '10px', borderRadius: '6px', backgroundColor: '#FFF7E8' }}>
                                                 <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', color: '#333333', mb: '8px' }}>
-                                                    Excluir esta categoria? Categorias usadas por receitas nao podem ser excluidas.
+                                                    Excluir esta categoria? Categorias usadas por receitas não podem ser excluídas.
                                                 </Typography>
                                                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: '8px', justifyContent: 'flex-end' }}>
                                                     <Button

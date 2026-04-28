@@ -37,7 +37,7 @@ const FavoritesContent = () => {
                 setFavoriteRecipes(recipes.map((recipe) => mapRecipeToCard(recipe)));
             } catch (error) {
                 if (isMounted) {
-                    setErrorMessage(error.message || 'Nao foi possivel carregar as favoritas.');
+                    setErrorMessage(error.message || 'Não foi possível carregar as favoritas.');
                 }
             } finally {
                 if (isMounted) {
@@ -67,7 +67,7 @@ const FavoritesContent = () => {
                 shouldFavorite,
             });
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel atualizar as favoritas.');
+            setErrorMessage(error.message || 'Não foi possível atualizar as favoritas.');
         }
     };
 
@@ -134,7 +134,7 @@ const FavoritesContent = () => {
                         letterSpacing: '-0.2px',
                         textAlign: 'center',
                     }}>
-                        Voce ainda nao favoritou receitas
+                        Você ainda não favoritou receitas
                     </Typography>
                     <Typography sx={{
                         fontFamily: FONT_PRIMARY,
@@ -145,7 +145,7 @@ const FavoritesContent = () => {
                         textAlign: 'center',
                         mt: '2px',
                     }}>
-                        Favorite receitas clicando no icone de coracao
+                        Favorite receitas clicando no ícone de coração
                     </Typography>
                     <Button
                         onClick={() => navigate('/')}

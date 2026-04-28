@@ -285,7 +285,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                 }
             } catch (error) {
                 if (isMounted) {
-                    setErrorMessage(error.message || 'Nao foi possivel carregar as categorias.');
+                    setErrorMessage(error.message || 'Não foi possível carregar as categorias.');
                 }
             } finally {
                 if (isMounted) {
@@ -386,7 +386,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
         ));
         const instructionErrors = instructions.map((instruction, index) => (
             validateRequiredText(instruction, {
-                label: `a instrucao ${index + 1}`,
+                label: `a instrução ${index + 1}`,
                 min: VALIDATION_LIMITS.stepMin,
                 max: VALIDATION_LIMITS.stepMax,
             })
@@ -396,12 +396,12 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
 
         return {
             title: validateRequiredText(formValues.title, {
-                label: 'o titulo da receita',
+                label: 'o título da receita',
                 min: VALIDATION_LIMITS.recipeTitleMin,
                 max: VALIDATION_LIMITS.recipeTitleMax,
             }),
             description: validateRequiredText(formValues.description, {
-                label: 'a descricao da receita',
+                label: 'a descrição da receita',
                 min: VALIDATION_LIMITS.recipeDescriptionMin,
                 max: VALIDATION_LIMITS.recipeDescriptionMax,
             }),
@@ -413,7 +413,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                 max: VALIDATION_LIMITS.prepTimeMax,
             }),
             portions: validateIntegerRange(formValues.portions, {
-                label: 'as porcoes',
+                label: 'as porções',
                 min: VALIDATION_LIMITS.portionsMin,
                 max: VALIDATION_LIMITS.portionsMax,
             }),
@@ -474,7 +474,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             setSuccessMessage('Receita criada com sucesso.');
             navigate('/receitas', { replace: true });
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel salvar a receita.');
+            setErrorMessage(error.message || 'Não foi possível salvar a receita.');
         } finally {
             setIsSubmitting(false);
         }
@@ -487,7 +487,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                     {isEditMode ? 'Editar receita' : '+ Adicionar nova receita'}
                 </Typography>
                 <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '14px', fontWeight: 400, color: '#333333', lineHeight: '18px' }}>
-                    {isEditMode ? 'Atualize as informacoes da receita' : 'Compartilhe suas receitas com o mundo'}
+                    {isEditMode ? 'Atualize as informações da receita' : 'Compartilhe suas receitas com o mundo'}
                 </Typography>
             </Box>
 
@@ -498,10 +498,10 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             )}
 
             <Paper elevation={0} sx={{ ...cardSx, mb: '12px' }}>
-                <SectionTitle>Informacoes basicas</SectionTitle>
+                <SectionTitle>Informações básicas</SectionTitle>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <FormField
-                        label="Titulo da receita"
+                        label="Título da receita"
                         height={26}
                         value={formValues.title}
                         onChange={handleFieldChange('title')}
@@ -510,7 +510,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                         inputProps={{ maxLength: VALIDATION_LIMITS.recipeTitleMax }}
                     />
                     <FormField
-                        label="Descricao"
+                        label="Descrição"
                         multiline
                         rows={2}
                         value={formValues.description}
@@ -576,7 +576,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                         </Box>
                         <Box sx={{ flex: 1 }}>
                             <FormField
-                                label="Porcoes"
+                                label="Porções"
                                 height={26}
                                 value={formValues.portions}
                                 onChange={handleFieldChange('portions')}
@@ -624,7 +624,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                         </Typography>
                     </Box>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '12px', fontWeight: 400, color: '#666666', mt: '4px' }}>
-                        PNG ou JPG ate 10MB
+                        PNG ou JPG até 10MB
                     </Typography>
                     <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', fontWeight: 400, color: '#9A9A9A', mt: '3px' }}>
                         {`${files.length} de ${VALIDATION_LIMITS.imageMaxFiles} imagens selecionadas`}
@@ -637,7 +637,7 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
                     {isEditMode && (
                         <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '10px', fontWeight: 400, color: '#9A9A9A', mt: '3px' }}>
                             {files.length > 0
-                                ? 'As imagens atuais serao substituidas'
+                                ? 'As imagens atuais serão substituídas'
                                 : `${initialRecipe?.recipe_images?.length || 0} imagens atuais`}
                         </Typography>
                     )}
@@ -657,8 +657,8 @@ const AddRecipeForm = ({ mode = 'create', initialRecipe = null }) => {
             </Box>
 
             <DynamicListSection
-                title="Instrucoes"
-                addLabel="+ Adicionar instrucao"
+                title="Instruções"
+                addLabel="+ Adicionar instrução"
                 items={instructions}
                 onChange={handleInstructionsChange}
                 placeholder="Descreva o passo"

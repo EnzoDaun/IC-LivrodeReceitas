@@ -16,10 +16,10 @@ function formatPrepTime(minutes) {
 
 function formatPortions(portions) {
     if (!portions || Number.isNaN(Number(portions))) {
-        return 'SEM PORCOES';
+        return 'SEM PORÇÕES';
     }
 
-    return `${portions} PORCOES`;
+    return `${portions} PORÇÕES`;
 }
 
 function resolveImageUrl(recipe) {
@@ -40,7 +40,7 @@ export function mapRecipeToCard(recipe) {
         rating: Number(recipe.average_rating || 0),
         prepTimeMinutes: Number(recipe.prep_time_minutes || 0),
         time: formatPrepTime(recipe.prep_time_minutes),
-        difficulty: recipe.difficulty || 'SEM NIVEL',
+        difficulty: recipe.difficulty || 'SEM NÍVEL',
         portions: formatPortions(recipe.portions),
         createdAt: recipe.created_at,
         isFavorite: Boolean(recipe.is_favorite),
@@ -50,7 +50,7 @@ export function mapRecipeToCard(recipe) {
 export function mapRecipeToJourneyCard(recipe) {
     return {
         ...mapRecipeToCard(recipe),
-        meta: `${formatPrepTime(recipe.prep_time_minutes)} · ${recipe.difficulty || 'SEM NIVEL'} · ${formatPortions(recipe.portions)}`,
+        meta: `${formatPrepTime(recipe.prep_time_minutes)} · ${recipe.difficulty || 'SEM NÍVEL'} · ${formatPortions(recipe.portions)}`,
     };
 }
 
@@ -60,7 +60,7 @@ export function mapRecipeToDetail(recipe) {
         title: recipe.title,
         description: recipe.description,
         category: recipe.category,
-        difficulty: recipe.difficulty || 'SEM NIVEL',
+        difficulty: recipe.difficulty || 'SEM NÍVEL',
         prepTime: formatPrepTime(recipe.prep_time_minutes),
         portions: formatPortions(recipe.portions),
         rating: Number(recipe.average_rating || 0),
@@ -91,14 +91,14 @@ export function mapDashboardStats(recipes) {
             description: `${publishedRecipes} publicadas`,
         },
         {
-            label: 'Media de avaliacoes',
+            label: 'Média de avaliações',
             value: averageRating,
             description: 'De 5 estrelas',
         },
         {
             label: 'Reviews totais',
             value: '0',
-            description: 'Reservado para proximas iteracoes',
+            description: 'Reservado para próximas iterações',
         },
     ];
 }

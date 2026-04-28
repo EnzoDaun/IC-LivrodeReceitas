@@ -32,7 +32,7 @@ const EditRecipePage = () => {
                 }
             } catch (error) {
                 if (isMounted) {
-                    setErrorMessage(error.message || 'Nao foi possivel carregar a receita.');
+                    setErrorMessage(error.message || 'Não foi possível carregar a receita.');
                 }
             } finally {
                 if (isMounted) {

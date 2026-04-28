@@ -19,7 +19,7 @@ const footerLinks = [
     { label: 'RECEITAS', to: '/receitas' },
     { label: 'MAIS VISTAS', scrollTo: 'mais-vistas' },
     { label: 'FAVORITAS', to: '/favoritas' },
-    { label: 'SOBRE NOS', to: '/sobre' },
+    { label: 'SOBRE NÓS', to: '/sobre' },
     { label: 'LOGIN', to: '/login' },
 ];
 
@@ -49,7 +49,7 @@ const Footer = () => {
             await signOut();
             navigate('/login', { replace: true });
         } catch (error) {
-            window.alert(error.message || 'Nao foi possivel sair da conta.');
+            window.alert(error.message || 'Não foi possível sair da conta.');
         }
     };
 
@@ -103,21 +103,21 @@ const Footer = () => {
                         <Box
                             component="img"
                             src="/assets/icons/logo.png"
-                            alt="Livro de receitas"
+                            alt="Receitas Fantásticas"
                             sx={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
                         />
                         <Typography
                             variant="body2"
-                            sx={{ fontFamily: FONT_SANS, width: 77, color: 'primary.contrastText', fontWeight: 600, fontSize: '13px', lineHeight: 1.2 }}
+                            sx={{ fontFamily: FONT_SANS, width: 110, color: 'primary.contrastText', fontWeight: 600, fontSize: '13px', lineHeight: 1.2 }}
                         >
-                            Livro de receitas
+                            Receitas Fantásticas
                         </Typography>
                     </Box>
 
                     {/* ── LINKS ── */}
                     <Box
                         component="nav"
-                        aria-label="Links do rodape"
+                        aria-label="Links do rodapé"
                         sx={{
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexWrap: 'wrap', gap: { xs: 1.2, md: 1.6 },

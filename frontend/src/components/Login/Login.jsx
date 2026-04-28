@@ -110,7 +110,7 @@ const Login = () => {
                 ? validatePasswordForRegister(password)
                 : (mode === 'login' ? validatePasswordForLogin(password) : ''),
             confirmPassword: mode === 'register' && password !== confirmPassword
-                ? 'As senhas nao coincidem.'
+                ? 'As senhas não coincidem.'
                 : '',
         };
         const validationMessage = getFirstValidationMessage(nextErrors);
@@ -142,14 +142,14 @@ const Login = () => {
                     password,
                     fullName: normalizeSpaces(fullName),
                 });
-                setFeedbackMessage('Conta criada. Verifique seu email para confirmar o cadastro, se a confirmacao estiver ativa.');
+                setFeedbackMessage('Conta criada. Verifique seu e-mail para confirmar o cadastro, se a confirmação estiver ativa.');
                 return;
             }
 
             await resetPassword(normalizedEmail);
-            setFeedbackMessage('Email de recuperacao enviado.');
+            setFeedbackMessage('E-mail de recuperação enviado.');
         } catch (error) {
-            setLocalError(error.message || 'Nao foi possivel concluir a autenticacao.');
+            setLocalError(error.message || 'Não foi possível concluir a autenticação.');
         } finally {
             setIsSubmitting(false);
         }
@@ -181,8 +181,8 @@ const Login = () => {
 
                     <Typography sx={{ fontWeight: 'medium', mt: 1.2, color: '#667085', maxWidth: 360 }}>
                         {mode === 'reset'
-                            ? 'Informe seu email para recuperar a senha'
-                            : 'Insira suas informacoes de login'}
+                            ? 'Informe seu e-mail para recuperar a senha'
+                            : 'Insira suas informações de login'}
                     </Typography>
 
                     <Stack component="form" spacing={mode === 'register' ? 2.5 : 4} sx={{ mt: 4 }} onSubmit={handleSubmit}>
@@ -217,7 +217,7 @@ const Login = () => {
                                     fullWidth
                                     type="email"
                                     variant="outlined"
-                                    label="Email"
+                                    label="E-mail"
                                     value={email}
                                     onChange={(event) => {
                                         setEmail(event.target.value.slice(0, VALIDATION_LIMITS.emailMax));
@@ -332,7 +332,7 @@ const Login = () => {
                                     sx={inputStyles}
                                     slotProps={{
                                         input: {
-                                            placeholder: mode === 'reset' ? 'Nao necessario para recuperacao' : 'Senha',
+                                            placeholder: mode === 'reset' ? 'Não necessário para recuperação' : 'Senha',
                                             startAdornment: (
                                                 <InputAdornment position="start">
                                                     <PersonSharp sx={{ fontSize: 20, color: '#98A2B3' }} />
@@ -374,7 +374,7 @@ const Login = () => {
                                 <Box component="span">
                                     {mode === 'login' && 'Entrar'}
                                     {mode === 'register' && 'Criar conta'}
-                                    {mode === 'reset' && 'Enviar recuperacao'}
+                                    {mode === 'reset' && 'Enviar recuperação'}
                                 </Box>
                                 <Typography component="span" sx={{ fontSize: '20px', lineHeight: 1 }}>{'>'}</Typography>
                             </Button>
@@ -404,7 +404,7 @@ const Login = () => {
                             onClick={() => handleModeChange(mode === 'register' ? 'login' : 'register')}
                             sx={{ border: 'none', background: 'transparent', fontSize: '13px', color: '#F29F05', fontWeight: 'bold', textAlign: 'center', cursor: 'pointer', '&:hover': { color: '#F2C442' } }}
                         >
-                            {mode === 'register' ? 'Ja tenho conta' : 'Registrar nova conta'}
+                            {mode === 'register' ? 'Já tenho conta' : 'Registrar nova conta'}
                         </Typography>
                     </Stack>
                 </Box>

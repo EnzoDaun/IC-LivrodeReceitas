@@ -3,7 +3,7 @@ export const primaryNavigationLinks = [
     { label: 'E-book', to: '/ebook' },
     { label: 'Mais vistas', scrollTo: 'mais-vistas' },
     { label: 'Favoritas', to: '/favoritas' },
-    { label: 'Sobre nos', to: '/sobre' },
+    { label: 'Sobre nós', to: '/sobre' },
     { label: 'Login', to: '/login' },
 ];
 
@@ -11,8 +11,8 @@ export const journeyFilters = [
     'TODAS',
     'VEGAN',
     'SOBREMESAS',
-    'ALMOCO',
+    'ALMOÇO',
     'JANTA',
-    'CAFE DA MANHA',
+    'CAFÉ DA MANHÃ',
     'LANCHES',
 ];

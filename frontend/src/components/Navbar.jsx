@@ -104,7 +104,7 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
             await signOut();
             navigate('/login', { replace: true });
         } catch (error) {
-            window.alert(error.message || 'Nao foi possivel sair da conta.');
+            window.alert(error.message || 'Não foi possível sair da conta.');
         }
     };
 
@@ -378,13 +378,13 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                             flexShrink: 0, minWidth: { xs: 'auto', md: '120px' }, textDecoration: 'none',
                         }}
                     >
-                        <Box component="img" src="/assets/icons/logo.png" alt="Livro de Receitas logo" sx={{ width: 36, height: 36, objectFit: 'contain' }} />
+                        <Box component="img" src="/assets/icons/logo.png" alt="Receitas Fantásticas logo" sx={{ width: 36, height: 36, objectFit: 'contain' }} />
                         <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Livro de
+                                Receitas
                             </Typography>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                receitas
+                                Fantásticas
                             </Typography>
                         </Box>
                     </Box>
@@ -594,13 +594,13 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                         onClick={() => setMobileMenuOpen(false)}
                         sx={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', minWidth: 0 }}
                     >
-                        <Box component="img" src="/assets/icons/logo.png" alt="Livro de Receitas logo" sx={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }} />
+                        <Box component="img" src="/assets/icons/logo.png" alt="Receitas Fantásticas logo" sx={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }} />
                         <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, minWidth: 0 }}>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Livro de
+                                Receitas
                             </Typography>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                receitas
+                                Fantásticas
                             </Typography>
                         </Box>
                     </Box>

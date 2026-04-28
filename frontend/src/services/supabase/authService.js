@@ -58,9 +58,9 @@ export async function signUpWithPassword({ email, password, fullName }) {
 
     if (error) throw error;
 
-    // Supabase retorna identities[] vazio quando email já existe e confirmação está ativa
+    // Supabase retorna identities[] vazio quando e-mail já existe e confirmação está ativa
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        throw new Error('Este email já está cadastrado. Tente fazer login ou recupere sua senha.');
+        throw new Error('Este e-mail já está cadastrado. Tente fazer login ou recupere sua senha.');
     }
 
     return data;

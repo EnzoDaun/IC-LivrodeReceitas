@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
                 }
             } catch (error) {
                 if (!isMounted) return;
-                setAuthError(error.message || 'Nao foi possivel carregar a sessao.');
+                setAuthError(error.message || 'Não foi possível carregar a sessão.');
             } finally {
                 if (isMounted) {
                     setIsLoading(false);
@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
                     }
                 } catch (error) {
                     if (isMounted) {
-                        setAuthError(error.message || 'Nao foi possivel sincronizar o perfil.');
+                        setAuthError(error.message || 'Não foi possível sincronizar o perfil.');
                     }
                 }
             }, 0);

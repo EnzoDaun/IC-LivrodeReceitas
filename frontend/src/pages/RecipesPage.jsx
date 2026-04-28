@@ -73,7 +73,7 @@ const RecipesPage = () => {
                 })));
             } catch (error) {
                 if (isMounted) {
-                    setErrorMessage(error.message || 'Nao foi possivel carregar as receitas.');
+                    setErrorMessage(error.message || 'Não foi possível carregar as receitas.');
                 }
             } finally {
                 if (isMounted) {
@@ -174,7 +174,7 @@ const RecipesPage = () => {
                 shouldFavorite,
             });
         } catch (error) {
-            setErrorMessage(error.message || 'Nao foi possivel atualizar os favoritos.');
+            setErrorMessage(error.message || 'Não foi possível atualizar os favoritos.');
         }
     };
 

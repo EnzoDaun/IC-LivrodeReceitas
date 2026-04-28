@@ -73,7 +73,7 @@ const HomePage = () => {
                 setJourneyRecipes(allPublished.map(toCard));
             } catch (error) {
                 if (isMounted) {
-                    setRecipesError(error.message || 'Nao foi possivel carregar as receitas.');
+                    setRecipesError(error.message || 'Não foi possível carregar as receitas.');
                 }
             } finally {
                 if (isMounted) {
@@ -111,7 +111,7 @@ const HomePage = () => {
                 shouldFavorite,
             });
         } catch (error) {
-            setRecipesError(error.message || 'Nao foi possivel atualizar os favoritos.');
+            setRecipesError(error.message || 'Não foi possível atualizar os favoritos.');
         }
     };
 
@@ -130,8 +130,8 @@ const HomePage = () => {
                 initialActiveLink="Receitas"
             />
             <Hero
-                title="Livro de receitas"
-                subtitle="Embarque num mundo de sabores e alegrias com receitas fantasticos usando aproveitamento integral dos alimentos"
+                title="Receitas Fantásticas"
+                subtitle="Embarque num mundo de sabores e alegrias com receitas fantásticas usando aproveitamento integral dos alimentos"
                 ctaText="Explorar Receitas"
                 onCtaClick={handleCtaClick}
             />

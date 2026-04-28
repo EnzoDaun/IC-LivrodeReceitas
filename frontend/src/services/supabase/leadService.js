@@ -32,7 +32,7 @@ export async function sendEbookLead({ email }) {
             throw new Error(errorDetails.error);
         }
 
-        throw new Error(error.message || 'Nao foi possivel enviar o e-book.');
+        throw new Error(error.message || 'Não foi possível enviar o e-book.');
     }
 
     if (data?.error) {

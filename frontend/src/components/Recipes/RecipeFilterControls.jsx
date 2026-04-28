@@ -88,7 +88,7 @@ function RecipeFilterControls({
                 label="Buscar"
                 value={filters.search}
                 onChange={(event) => onFilterChange('search', event.target.value.slice(0, VALIDATION_LIMITS.searchMax))}
-                placeholder="Nome, descricao ou categoria"
+                placeholder="Nome, descrição ou categoria"
                 size="small"
                 inputProps={{ maxLength: VALIDATION_LIMITS.searchMax }}
                 InputProps={{

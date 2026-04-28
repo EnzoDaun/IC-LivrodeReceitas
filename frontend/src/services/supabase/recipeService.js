@@ -79,19 +79,19 @@ function validateRecipePayload({
     ));
     const instructionErrors = normalizedInstructions.map((instruction, index) => (
         validateRequiredText(instruction, {
-            label: `a instrucao ${index + 1}`,
+            label: `a instrução ${index + 1}`,
             min: VALIDATION_LIMITS.stepMin,
             max: VALIDATION_LIMITS.stepMax,
         })
     ));
     const errors = {
         title: validateRequiredText(title, {
-            label: 'o titulo da receita',
+            label: 'o título da receita',
             min: VALIDATION_LIMITS.recipeTitleMin,
             max: VALIDATION_LIMITS.recipeTitleMax,
         }),
         description: validateRequiredText(description, {
-            label: 'a descricao da receita',
+            label: 'a descrição da receita',
             min: VALIDATION_LIMITS.recipeDescriptionMin,
             max: VALIDATION_LIMITS.recipeDescriptionMax,
         }),
@@ -103,7 +103,7 @@ function validateRecipePayload({
             max: VALIDATION_LIMITS.prepTimeMax,
         }),
         portions: validateIntegerRange(portions, {
-            label: 'as porcoes',
+            label: 'as porções',
             min: VALIDATION_LIMITS.portionsMin,
             max: VALIDATION_LIMITS.portionsMax,
         }),
@@ -113,7 +113,7 @@ function validateRecipePayload({
             : 'Informe pelo menos um ingrediente.',
         instructions: normalizedInstructions.length > 0
             ? instructionErrors.find(Boolean) || ''
-            : 'Informe pelo menos uma instrucao.',
+            : 'Informe pelo menos uma instrução.',
     };
     const validationMessage = getFirstValidationMessage(errors);
 
@@ -176,7 +176,7 @@ export async function updateRecipeCategory({ categoryId, name }) {
     const categoryName = normalizeCategoryName(name);
 
     if (!categoryId) {
-        throw new Error('Categoria invalida.');
+        throw new Error('Categoria inválida.');
     }
 
     if (!categoryName) {
@@ -200,7 +200,7 @@ export async function updateRecipeCategory({ categoryId, name }) {
         .single();
 
     if (error?.code === '23505') {
-        throw new Error('Essa categoria ja existe.');
+        throw new Error('Essa categoria já existe.');
     }
 
     if (error) throw error;
@@ -212,7 +212,7 @@ export async function deleteRecipeCategory({ categoryId, name }) {
     const client = requireSupabase();
 
     if (!categoryId) {
-        throw new Error('Categoria invalida.');
+        throw new Error('Categoria inválida.');
     }
 
     const { count, error: countError } = await client
@@ -223,7 +223,7 @@ export async function deleteRecipeCategory({ categoryId, name }) {
     if (countError) throw countError;
 
     if ((count || 0) > 0) {
-        throw new Error('Nao e possivel excluir uma categoria usada por receitas.');
+        throw new Error('Não é possível excluir uma categoria usada por receitas.');
     }
 
     const { error } = await client
@@ -232,7 +232,7 @@ export async function deleteRecipeCategory({ categoryId, name }) {
         .eq('id', categoryId);
 
     if (error?.code === '23503') {
-        throw new Error('Nao e possivel excluir uma categoria usada por receitas.');
+        throw new Error('Não é possível excluir uma categoria usada por receitas.');
     }
 
     if (error) throw error;
