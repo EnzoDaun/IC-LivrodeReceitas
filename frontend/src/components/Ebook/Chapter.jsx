@@ -53,7 +53,7 @@ const Chapter = ({
                             letterSpacing: 0,
                         }}
                     >
-                        CAPITULO {chapterNumber}
+                        CAPÍTULO {chapterNumber}
                     </Typography>
                 </Box>
             )}

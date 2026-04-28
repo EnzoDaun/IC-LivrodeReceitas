@@ -31,7 +31,7 @@ const EbookHero = () => (
                     variant="h1"
                     sx={{ fontFamily: 'Georgia, "Times New Roman", serif', color: 'text.primary', fontWeight: 700, fontSize: { xs: '34px', md: '54px' }, lineHeight: 1 }}
                 >
-                    Raízes e Sabores: Afeto em Cada Parte do Alimento
+                    Raízes e sabores: afeto em cada parte do alimento
                 </Typography>
                 <Typography
                     variant="body1"
