@@ -58,7 +58,7 @@ const EbookContent = () => {
                                 <Box sx={chapterContentSx}>
                                     <Chapter
                                         chapterNumber="1"
-                                        title="Onde tudo começa: Afeto, memória e propósito"
+                                        title="Onde tudo começa: afeto, memória e propósito"
                                         text="Minha paixão pela gastronomia começou cedo, com o cheiro da lenha queimando e o calor da cozinha do sítio onde minha avó morava. Durante as férias de inverno, eu acompanhava cada movimento dela, fascinado com a maneira como cozinhava — sem pressa, sem desperdício, com o que havia disponível e sempre com muito carinho. No fogão a lenha, cada receita tinha um tempo, um cuidado e um sabor que se tornaram inesquecíveis. Foi ali, naquele cenário simples e cheio de vida, que aprendi que cozinhar é mais do que preparar alimentos: é um ato de cuidado, de memória e de conexão com a terra e com as pessoas."
                                     />
                                 </Box>
@@ -108,7 +108,7 @@ const EbookContent = () => {
 
                                     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', gap: { xs: 2, md: 2.5 } }}>
                                         <Typography variant="h2" sx={{ fontFamily: 'Georgia, "Times New Roman", serif', color: 'text.primary', fontWeight: 700, fontSize: { xs: '34px', sm: '40px', md: '52px' }, lineHeight: 1.1 }}>
-                                            Da Cozinha ao Propósito
+                                            Da cozinha ao propósito
                                         </Typography>
                                         <Typography variant="body1" sx={{ fontFamily: FONT_SANS, color: 'text.primary', fontSize: { xs: '15px', sm: '17px', md: '20px' }, lineHeight: 1.6 }}>
                                             Este livro nasce do resgate de tudo aquilo que aprendi observando minha avó e da vontade de unir essa herança afetiva com um propósito atual: o aproveitamento integral dos alimentos. Cada receita convida a olhar para os ingredientes com mais respeito e criatividade.
@@ -124,7 +124,7 @@ const EbookContent = () => {
                                 <Box sx={chapterContentSx}>
                                     <Chapter
                                         chapterNumber="2"
-                                        title="Gastronomia Afetiva: Sabores que Contam Histórias"
+                                        title="Gastronomia afetiva: sabores que contam histórias"
                                         showText={false}
                                     />
                                     <Box sx={{ mt: { xs: 2.5, md: 3 }, width: '100%', backgroundColor: 'background.defaultDark', borderRadius: { xs: '8px', md: '20px' }, px: { xs: 2, sm: 3.5, md: 5 }, py: { xs: 3, sm: 3.5, md: 5 }, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: { xs: 2, md: 2.5 }, boxSizing: 'border-box' }}>
@@ -150,7 +150,7 @@ const EbookContent = () => {
                                 <Box sx={chapterContentSx}>
                                     <Chapter
                                         chapterNumber="3"
-                                        title="Por que o Aproveitamento Integral Importa Hoje"
+                                        title="Por que o aproveitamento integral importa hoje"
                                         text="O ato de se alimentar vai muito além da simples ingestão de nutrientes — trata-se de um processo permeado por dimensões sociais, culturais, ambientais e políticas. Vivemos em uma era marcada por paradoxos: de um lado, a fome que persiste como desafio global; de outro, o desperdício de alimentos em proporções alarmantes. Aproximadamente um terço de todos os alimentos produzidos no mundo é desperdiçado anualmente, ao mesmo tempo em que mais de 828 milhões de pessoas enfrentam insegurança alimentar. O aproveitamento integral é uma prática urgente e necessária — ao utilizar cascas, talos e sementes, é possível não apenas ampliar o valor nutricional das refeições, mas também questionar modelos de consumo que reforçam desigualdades e impactos ambientais."
                                     />
                                 </Box>
@@ -166,7 +166,7 @@ const EbookContent = () => {
                                         Faça Parte Desta Jornada
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontFamily: FONT_SANS, color: 'text.primary', fontSize: { xs: '15px', sm: '17px', md: '20px' }, lineHeight: 1.6 }}>
-                                        Receba gratuitamente o e-book <em>Raízes e Sabores</em> e descubra como transformar cada parte do alimento em uma refeição cheia de afeto, sabor e propósito.
+                                        Receba gratuitamente o e-book <em>Raízes e sabores</em> e descubra como transformar cada parte do alimento em uma refeição cheia de afeto, sabor e propósito.
                                     </Typography>
                                     <Button
                                         variant="contained"
