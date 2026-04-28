@@ -15,11 +15,13 @@ function formatPrepTime(minutes) {
 }
 
 function formatPortions(portions) {
-    if (!portions || Number.isNaN(Number(portions))) {
+    const portionCount = Number(portions);
+
+    if (!portionCount || Number.isNaN(portionCount)) {
         return 'SEM PORÇÕES';
     }
 
-    return `${portions} PORÇÕES`;
+    return `${portionCount} ${portionCount === 1 ? 'PORÇÃO' : 'PORÇÕES'}`;
 }
 
 function resolveImageUrl(recipe) {
