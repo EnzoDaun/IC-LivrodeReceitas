@@ -16,10 +16,11 @@ const socialIconByName = {
 };
 
 const footerLinks = [
+    { label: 'NOSSA HISTÓRIA', to: '/ourstory' },
     { label: 'RECEITAS', to: '/receitas' },
     { label: 'MAIS VISTAS', scrollTo: 'mais-vistas' },
     { label: 'FAVORITAS', to: '/favoritas' },
-    { label: 'SOBRE NÓS', to: '/sobre' },
+    { label: 'SOBRE', to: '/sobre' },
     { label: 'LOGIN', to: '/login' },
 ];
 
