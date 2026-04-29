@@ -119,11 +119,11 @@ export default function AboutSection() {
                     </Button>
                 </Box>
 
-                {/* ── IMAGEM 1 — steak (topo central) ── */}
+                {/* ── IMAGEM 1 — (topo central) ── */}
                 <Box
                     component="img"
-                    src="/assets/aboutus/salmon.png"
-                    alt="Carne grelhada"
+                    src="/assets/aboutus/IMG_5583.png"
+                    alt="Maçarico"
                     sx={{
                         position: { xs: 'static', md: 'absolute' },
                         left: { md: '458px' },
@@ -141,7 +141,7 @@ export default function AboutSection() {
                 {/* ── IMAGEM 2 — chefs (coluna direita) ── */}
                 <Box
                     component="img"
-                    src="/assets/aboutus/chef.png"
+                    src="/assets/ourstory/IMG_5588.png"
                     alt="Chefs na cozinha"
                     sx={{
                         position: { xs: 'static', md: 'absolute' },
@@ -157,10 +157,10 @@ export default function AboutSection() {
                     }}
                 />
 
-                {/* ── IMAGEM 3 — panela (parte inferior) ── */}
+                {/* ── IMAGEM 3 — (parte inferior) ── */}
                 <Box
                     component="img"
-                    src="/assets/aboutus/pan.png"
+                    src="/assets/aboutus/IMG_5589.png"
                     alt="Panela com legumes"
                     sx={{
                         position: { xs: 'static', md: 'absolute' },

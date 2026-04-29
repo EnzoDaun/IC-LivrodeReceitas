@@ -87,7 +87,7 @@ export default function SobreNos() {
                     </Typography>
                 </Box>
                 {/* Imagem */}
-                <Box component="img" src="/assets/aboutus/salmon.png" alt="Prato afetivo"
+                <Box component="img" src="/assets/aboutus/IMG_5589.png" alt="Prato afetivo"
                     sx={{ width: { xs: '100%', md: '340px' }, height: { xs: '220px', md: 'auto' }, objectFit: 'cover', objectPosition: 'center', flexShrink: 0 }}
                 />
             </Box>
@@ -147,8 +147,8 @@ export default function SobreNos() {
                             Como afirma Montanari (2013), <Box component="em">a comida é uma linguagem</Box> — um código através do qual sociedades expressam valores, tradições e afetos. Cada receita deste livro carrega essa dimensão: técnica culinária entrelaçada com oralidade, emoção e memória coletiva.
                         </Typography>
                     </Box>
-                    <Box component="img" src="/assets/aboutus/chef.png" alt="Chef na cozinha"
-                        sx={{ width: '100%', height: '200px', objectFit: 'cover', objectPosition: 'center 20%', display: 'block' }}
+                    <Box component="img" src="/assets/aboutus/IMG_5593.png" alt="Chef na cozinha"
+                        sx={{ width: '100%', height: '200px', objectFit: 'cover', objectPosition: 'center 60%', display: 'block' }}
                     />
                 </Box>
 

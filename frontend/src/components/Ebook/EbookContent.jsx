@@ -69,7 +69,7 @@ const EbookContent = () => {
                                     <Box sx={{ width: '100%', maxWidth: { xs: 360, md: '100%' }, mx: { xs: 'auto', md: 0 }, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5 }}>
                                         <Box
                                             component="img"
-                                            src="/assets/recipes/RecipeImage.png"
+                                            src="/assets/ourstory/IMG_5588.png"
                                             alt="Cozinha afetiva"
                                             sx={{ width: '100%', aspectRatio: '3 / 4.6', objectFit: 'cover', borderRadius: { xs: '8px', md: '20px' }, boxShadow: '0 18px 42px rgba(45, 45, 45, 0.14)', display: 'block' }}
                                         />
