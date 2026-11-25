@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Box, Typography, Button } from '@mui/material';
 
 const Hero = ({
-    title = 'Receitas Fantásticas',
+    title = 'AlimenTO TOdo Sustenta',
     subtitle = 'Embarque num mundo de sabores e alegrias com receitas fantásticas usando do aproveitamento integral dos alimentos',
     ctaText = 'Explorar Receitas',
     backgroundImage = '/assets/backgrounds/backgroundHero.jpg',

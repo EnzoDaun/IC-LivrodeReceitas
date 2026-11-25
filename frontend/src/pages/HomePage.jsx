@@ -130,7 +130,6 @@ const HomePage = () => {
                 initialActiveLink="Receitas"
             />
             <Hero
-                title="Receitas Fantásticas"
                 subtitle="Embarque num mundo de sabores e alegrias com receitas fantásticas usando aproveitamento integral dos alimentos"
                 ctaText="Explorar Receitas"
                 onCtaClick={handleCtaClick}
