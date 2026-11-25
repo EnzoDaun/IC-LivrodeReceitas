@@ -378,13 +378,13 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                             flexShrink: 0, minWidth: { xs: 'auto', md: '120px' }, textDecoration: 'none',
                         }}
                     >
-                        <Box component="img" src="/assets/icons/logo.png" alt="Receitas Fantásticas logo" sx={{ width: 36, height: 36, objectFit: 'contain' }} />
+                        <Box component="img" src="/assets/icons/logo.png" alt="AlimenTO TOdo Sustenta logo" sx={{ width: 36, height: 36, objectFit: 'contain' }} />
                         <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Receitas
+                                AlimenTO TOdo
                             </Typography>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Fantásticas
+                                Sustenta
                             </Typography>
                         </Box>
                     </Box>
@@ -594,13 +594,13 @@ const Navbar = ({ links, onSearch, initialActiveLink = 'Receitas', showSearch = 
                         onClick={() => setMobileMenuOpen(false)}
                         sx={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', minWidth: 0 }}
                     >
-                        <Box component="img" src="/assets/icons/logo.png" alt="Receitas Fantásticas logo" sx={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }} />
+                        <Box component="img" src="/assets/icons/logo.png" alt="AlimenTO TOdo Sustenta logo" sx={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }} />
                         <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, minWidth: 0 }}>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Receitas
+                                AlimenTO TOdo
                             </Typography>
                             <Typography sx={{ fontFamily: FONT_PRIMARY, fontSize: '13px', fontWeight: 700, color: '#2D2D2D', lineHeight: '14px' }}>
-                                Fantásticas
+                                Sustenta
                             </Typography>
                         </Box>
                     </Box>
