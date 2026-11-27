@@ -104,14 +104,14 @@ const Footer = () => {
                         <Box
                             component="img"
                             src="/assets/icons/logo.png"
-                            alt="Receitas Fantásticas"
+                            alt="AlimenTO TOdo Sustenta"
                             sx={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
                         />
                         <Typography
                             variant="body2"
                             sx={{ fontFamily: FONT_SANS, width: 110, color: 'primary.contrastText', fontWeight: 600, fontSize: '13px', lineHeight: 1.2 }}
                         >
-                            Receitas Fantásticas
+                            AlimenTO TOdo Sustenta
                         </Typography>
                     </Box>
 
